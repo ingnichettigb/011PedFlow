@@ -1,6 +1,6 @@
 const es = {
   app: { name: "PedFlow", tagline: "Clasificación PED desde SDS + CLP" },
-  nav: { calculator: "Calculadora", registry: "Registro", logout: "Cerrar sesión", language: "Idioma" },
+  nav: { calculator: "Calculadora", registry: "Registro", databases: "Bases de datos", logout: "Cerrar sesión", language: "Idioma" },
   auth: {
     signin_title: "Acceder a PedFlow",
     signin_sub: "Herramienta de clasificación PED 2014/68/UE",
