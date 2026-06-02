@@ -1,6 +1,6 @@
 const de = {
   app: { name: "PedFlow", tagline: "PED-Klassifizierung aus SDB + CLP" },
-  nav: { calculator: "Rechner", registry: "Register", logout: "Abmelden", language: "Sprache" },
+  nav: { calculator: "Rechner", registry: "Register", databases: "Datenbanken", logout: "Abmelden", language: "Sprache" },
   auth: {
     signin_title: "Bei PedFlow anmelden",
     signin_sub: "Klassifizierungswerkzeug PED 2014/68/EU",
@@ -90,5 +90,21 @@ const de = {
     of: "von",
   },
   common: { cancel: "Abbrechen", confirm: "Bestätigen", loading: "Laden..." },
+  db: {
+    title: "Datenbanken",
+    sub: "Referenzdatenbanken für die Berechnungen",
+    codes_db_title: "H-Code Datenbank (CLP)",
+    add_row: "[017] Zeile hinzufügen",
+    search: "Suche nach Code, Kategorie, Beschreibung oder Gruppe",
+    empty: "Keine Einträge gefunden.",
+    count: "{{n}} Zeilen",
+    col_code: "Code",
+    col_category: "Kategorie",
+    col_description: "Beschreibung",
+    col_group: "PED-Gruppe",
+    save: "Speichern",
+    added: "Zeile zur Datenbank hinzugefügt",
+    fill_all: "Bitte alle Felder ausfüllen",
+  },
 };
 export default de;
