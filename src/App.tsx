@@ -13,6 +13,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Calculator from "./pages/Calculator";
 import Registry from "./pages/Registry";
+import Databases from "./pages/Databases";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -33,6 +34,7 @@ const App = () => (
             <Route path="/calcolatore" element={<ProtectedRoute><Calculator /></ProtectedRoute>} />
             <Route path="/classificazione/:id" element={<ProtectedRoute><Calculator /></ProtectedRoute>} />
             <Route path="/registro" element={<ProtectedRoute><Registry /></ProtectedRoute>} />
+            <Route path="/databases" element={<ProtectedRoute><Databases /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
