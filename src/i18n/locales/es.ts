@@ -1,6 +1,6 @@
 const es = {
   app: { name: "PedFlow", tagline: "Clasificación PED desde SDS + CLP" },
-  nav: { calculator: "Calculadora", registry: "Registro", logout: "Cerrar sesión", language: "Idioma" },
+  nav: { calculator: "Calculadora", registry: "Registro", databases: "Bases de datos", logout: "Cerrar sesión", language: "Idioma" },
   auth: {
     signin_title: "Acceder a PedFlow",
     signin_sub: "Herramienta de clasificación PED 2014/68/UE",
@@ -90,5 +90,21 @@ const es = {
     of: "de",
   },
   common: { cancel: "Cancelar", confirm: "Confirmar", loading: "Cargando..." },
+  db: {
+    title: "Bases de datos",
+    sub: "Bases de datos de referencia usadas en los cálculos",
+    codes_db_title: "Base de datos códigos H (CLP)",
+    add_row: "[017] Añadir fila",
+    search: "Buscar por código, categoría, descripción o grupo",
+    empty: "Sin resultados.",
+    count: "{{n}} filas",
+    col_code: "Código",
+    col_category: "Categoría",
+    col_description: "Descripción",
+    col_group: "Grupo PED",
+    save: "Guardar",
+    added: "Fila añadida a la base de datos",
+    fill_all: "Complete todos los campos",
+  },
 };
 export default es;

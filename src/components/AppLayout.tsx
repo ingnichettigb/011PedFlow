@@ -5,8 +5,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Calculator, BookMarked, LogOut, User, Menu, Globe, FlaskConical } from "lucide-react";
+import { Calculator, BookMarked, LogOut, User, Menu, Globe, Database } from "lucide-react";
 import { cn } from "@/lib/utils";
+import pedflowLogo from "@/assets/pedflow-logo.png.asset.json";
 
 const LANGS = [
   { code: "it", label: "Italiano" },
@@ -25,6 +26,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const navItems = [
     { to: "/calcolatore", icon: Calculator, label: t("nav.calculator") },
     { to: "/registro", icon: BookMarked, label: t("nav.registry") },
+    { to: "/databases", icon: Database, label: t("nav.databases") },
   ];
 
   const handleSignOut = async () => { await signOut(); navigate("/"); };
@@ -40,9 +42,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               <Menu className="h-6 w-6" />
             </Button>
             <Link to="/calcolatore" className="flex items-center gap-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
-                <FlaskConical className="h-5 w-5 text-primary-foreground" />
-              </div>
+              <img src={pedflowLogo.url} alt="PedFlow" className="h-10 w-10 rounded-lg object-contain bg-white" />
               <span className="text-xl font-bold text-foreground">{t("app.name")}</span>
             </Link>
           </div>
@@ -102,9 +102,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         <SheetContent side="left" className="w-72 p-0">
           <SheetHeader className="border-b border-border p-4">
             <SheetTitle className="flex items-center gap-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
-                <FlaskConical className="h-5 w-5 text-primary-foreground" />
-              </div>
+              <img src={pedflowLogo.url} alt="PedFlow" className="h-10 w-10 rounded-lg object-contain bg-white" />
               {t("app.name")}
             </SheetTitle>
           </SheetHeader>
