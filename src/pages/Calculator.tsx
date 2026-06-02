@@ -13,6 +13,7 @@ import { AlertTriangle, CheckCircle2, Calculator as CalcIcon, FileDown, RotateCc
 import { classify, validateHCode, type ClassificationResult } from "@/lib/pedLogic";
 import { generatePedPdf } from "@/lib/pedPdf";
 import { supabase } from "@/integrations/supabase/client";
+import type { Json } from "@/integrations/supabase/types";
 import { useAuth } from "@/contexts/AuthContext";
 
 const H_SLOTS = 12;
@@ -139,7 +140,7 @@ export default function Calculator() {
       determining_h_codes: r.determiningCodes,
       rationale,
       method: "SDS",
-      input_snapshot: form as unknown as Record<string, unknown>,
+      input_snapshot: form as unknown as Json,
     };
 
     let savedId = loadId;
