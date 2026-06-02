@@ -1,6 +1,6 @@
 const en = {
   app: { name: "PedFlow", tagline: "PED classification from SDS + CLP" },
-  nav: { calculator: "Calculator", registry: "Registry", logout: "Sign out", language: "Language" },
+  nav: { calculator: "Calculator", registry: "Registry", databases: "Databases", logout: "Sign out", language: "Language" },
   auth: {
     signin_title: "Sign in to PedFlow",
     signin_sub: "PED 2014/68/EU classification tool",
@@ -90,5 +90,21 @@ const en = {
     of: "of",
   },
   common: { cancel: "Cancel", confirm: "Confirm", loading: "Loading..." },
+  db: {
+    title: "Databases",
+    sub: "Reference databases used during calculations",
+    codes_db_title: "H-codes database (CLP)",
+    add_row: "[017] Add row",
+    search: "Search by code, category, description or group",
+    empty: "No rows found.",
+    count: "{{n}} rows",
+    col_code: "Code",
+    col_category: "Category",
+    col_description: "Description",
+    col_group: "PED Group",
+    save: "Save",
+    added: "Row added to database",
+    fill_all: "Please fill all fields",
+  },
 };
 export default en;
