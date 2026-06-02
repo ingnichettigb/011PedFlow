@@ -47,6 +47,39 @@ export type Database = {
         }
         Relationships: []
       }
+      h_codes_db: {
+        Row: {
+          categoria: string
+          codice: string
+          created_at: string
+          created_by: string | null
+          descrizione: string
+          gruppo_ped: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          categoria: string
+          codice: string
+          created_at?: string
+          created_by?: string | null
+          descrizione: string
+          gruppo_ped: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          categoria?: string
+          codice?: string
+          created_at?: string
+          created_by?: string | null
+          descrizione?: string
+          gruppo_ped?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       organizations: {
         Row: {
           address: string | null
