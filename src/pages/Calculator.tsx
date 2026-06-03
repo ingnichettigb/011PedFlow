@@ -15,6 +15,10 @@ import { generatePedPdf } from "@/lib/pedPdf";
 import { supabase } from "@/integrations/supabase/client";
 import type { Json } from "@/integrations/supabase/types";
 import { useAuth } from "@/contexts/AuthContext";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ClpSubstancesTable, type ClpRow } from "@/components/ClpSubstancesTable";
+import { Badge } from "@/components/ui/badge";
+import { Search } from "lucide-react";
 
 const H_SLOTS = 12;
 
@@ -51,6 +55,8 @@ export default function Calculator() {
   const [result, setResult] = useState<ClassificationResult | null>(null);
   const [loadId, setLoadId] = useState<string | null>(id ?? null);
   const [saving, setSaving] = useState(false);
+  const [clpOpen, setClpOpen] = useState(false);
+  const [clpHint, setClpHint] = useState<string | null>(null);
 
   // Load existing or duplicate
   useEffect(() => {
@@ -106,6 +112,25 @@ export default function Calculator() {
   };
 
   const handleReset = () => { setForm(emptyForm()); setResult(null); setLoadId(null); navigate("/calcolatore"); };
+
+  const handlePickClp = (row: ClpRow) => {
+    const codes = (row.hazard_codes ?? "")
+      .split(/[\s,;]+/)
+      .map((c) => c.trim().toUpperCase())
+      .filter((c) => /^H\d{3}/.test(c))
+      .map((c) => c.replace(/[^A-Z0-9]/g, ""));
+    const padded = [...codes, ...Array(H_SLOTS).fill("")].slice(0, H_SLOTS);
+    setForm((f) => ({
+      ...f,
+      fluidName: row.chemical_name,
+      casNo: row.cas_no ?? "",
+      ecNo: row.ec_no ?? "",
+      hCodes: padded,
+    }));
+    setClpHint(row.gruppo_ped);
+    setClpOpen(false);
+    toast.success(t("clp.imported"));
+  };
 
   const buildRationale = (r: ClassificationResult): string =>
     t(`reasons.${r.reasonKey}`, r.reasonParams);
@@ -188,10 +213,22 @@ export default function Calculator() {
 
         <Card>
           <CardHeader><CardTitle className="text-lg">{t("calc.fluid_section")}</CardTitle></CardHeader>
-          <CardContent className="grid gap-4 md:grid-cols-2">
+          <CardContent className="space-y-4">
+            <div className="flex flex-wrap items-center gap-3">
+              <Button type="button" variant="outline" size="lg" className="gap-2 h-12 text-base" onClick={() => setClpOpen(true)}>
+                <Search className="h-5 w-5" /> {t("clp.button")}
+              </Button>
+              {clpHint && (
+                <Badge variant="outline" className="text-base h-8 px-3">
+                  {t("clp.found_group")}: {clpHint}
+                </Badge>
+              )}
+            </div>
+            <div className="grid gap-4 md:grid-cols-2">
             <Field id="f-name" label={t("calc.l005_fluid_name")} value={form.fluidName} onChange={(v) => setForm({ ...form, fluidName: v })} required />
             <Field id="f-cas" label={t("calc.l006_cas")} value={form.casNo} onChange={(v) => setForm({ ...form, casNo: v })} />
             <Field id="f-ec" label={t("calc.l007_ec")} value={form.ecNo} onChange={(v) => setForm({ ...form, ecNo: v })} />
+            </div>
           </CardContent>
         </Card>
 
@@ -264,6 +301,15 @@ export default function Calculator() {
           </Card>
         )}
       </div>
+
+      <Dialog open={clpOpen} onOpenChange={setClpOpen}>
+        <DialogContent className="max-w-5xl">
+          <DialogHeader><DialogTitle>{t("clp.dialog_title")}</DialogTitle></DialogHeader>
+          <div className="max-h-[70vh] overflow-y-auto">
+            <ClpSubstancesTable onPick={handlePickClp} />
+          </div>
+        </DialogContent>
+      </Dialog>
     </AppLayout>
   );
 }
