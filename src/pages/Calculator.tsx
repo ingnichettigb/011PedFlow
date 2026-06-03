@@ -17,7 +17,6 @@ import type { Json } from "@/integrations/supabase/types";
 import { useAuth } from "@/contexts/AuthContext";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ClpSubstancesTable, type ClpRow } from "@/components/ClpSubstancesTable";
-import { Badge } from "@/components/ui/badge";
 import { Search } from "lucide-react";
 
 const H_SLOTS = 12;
