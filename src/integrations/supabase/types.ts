@@ -47,6 +47,45 @@ export type Database = {
         }
         Relationships: []
       }
+      clp_substances_db: {
+        Row: {
+          cas_no: string | null
+          chemical_name: string
+          created_at: string
+          created_by: string | null
+          ec_no: string | null
+          gruppo_ped: string
+          hazard_codes: string | null
+          id: string
+          index_no: string | null
+          updated_at: string
+        }
+        Insert: {
+          cas_no?: string | null
+          chemical_name: string
+          created_at?: string
+          created_by?: string | null
+          ec_no?: string | null
+          gruppo_ped: string
+          hazard_codes?: string | null
+          id?: string
+          index_no?: string | null
+          updated_at?: string
+        }
+        Update: {
+          cas_no?: string | null
+          chemical_name?: string
+          created_at?: string
+          created_by?: string | null
+          ec_no?: string | null
+          gruppo_ped?: string
+          hazard_codes?: string | null
+          id?: string
+          index_no?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       h_codes_db: {
         Row: {
           categoria: string
