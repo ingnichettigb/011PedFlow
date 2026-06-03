@@ -12,6 +12,8 @@ import { toast } from "sonner";
 import { Plus, Search, Database as DatabaseIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { validateHCode } from "@/lib/pedLogic";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ClpSubstancesTable } from "@/components/ClpSubstancesTable";
 
 type HCodeRow = {
   id: string;
@@ -120,6 +122,12 @@ export default function Databases() {
           </Dialog>
         </div>
 
+        <Tabs defaultValue="hcodes" className="w-full">
+          <TabsList className="h-12">
+            <TabsTrigger value="hcodes" className="text-base h-10 px-4">{t("db.tab_hcodes")}</TabsTrigger>
+            <TabsTrigger value="clp" className="text-base h-10 px-4">{t("db.tab_clp")}</TabsTrigger>
+          </TabsList>
+          <TabsContent value="hcodes" className="mt-4">
         <Card>
           <CardHeader className="space-y-3">
             <CardTitle className="text-lg">{t("db.codes_db_title")}</CardTitle>
@@ -158,6 +166,11 @@ export default function Databases() {
             <p className="text-xs text-muted-foreground mt-3">{t("db.count", { n: filtered.length })}</p>
           </CardContent>
         </Card>
+          </TabsContent>
+          <TabsContent value="clp" className="mt-4">
+            <ClpSubstancesTable />
+          </TabsContent>
+        </Tabs>
       </div>
     </AppLayout>
   );
