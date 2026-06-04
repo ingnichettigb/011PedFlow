@@ -58,6 +58,8 @@ export type Database = {
           hazard_codes: string | null
           id: string
           index_no: string | null
+          labelling_h_codes: string | null
+          pictograms: string | null
           updated_at: string
         }
         Insert: {
@@ -70,6 +72,8 @@ export type Database = {
           hazard_codes?: string | null
           id?: string
           index_no?: string | null
+          labelling_h_codes?: string | null
+          pictograms?: string | null
           updated_at?: string
         }
         Update: {
@@ -82,6 +86,8 @@ export type Database = {
           hazard_codes?: string | null
           id?: string
           index_no?: string | null
+          labelling_h_codes?: string | null
+          pictograms?: string | null
           updated_at?: string
         }
         Relationships: []
