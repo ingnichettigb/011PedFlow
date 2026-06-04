@@ -19,6 +19,8 @@ const es = {
     sub: "Directiva 2014/68/UE — Anexo II — Método SDS",
     doc_section: "Datos del documento",
     fluid_section: "Identificación del fluido",
+    tab_sds: "SDS – Ficha de seguridad",
+    tab_clp: "Nombre sustancia / CAS",
     sds_section: "SDS – Ficha de seguridad",
     op_section: "Condiciones operativas",
     l001_commessa: "[001] Pedido / Obra",
