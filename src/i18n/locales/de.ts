@@ -114,6 +114,8 @@ const de = {
     col_ec: "EC",
     col_hazards: "H-Codes",
     col_index: "Index Nr.",
+    col_pictograms: "Piktogramme",
+    col_label_hcodes: "Etikett H-Codes",
   },
   clp: {
     button: "[018] Fluid in CLP-Datenbank suchen",

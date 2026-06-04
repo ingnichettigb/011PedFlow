@@ -1,59 +1,22 @@
+## Aggiunta colonne CLP mancanti
 
+Allineo `clp_substances_db` con le due colonne non ancora importate dall'Annex VI.
 
-## Security Hardening Plan
+### Database
+- Migrazione: aggiungo a `clp_substances_db` le colonne
+  - `pictograms` (TEXT) — "Labelling – Pictogram, Signal Word Code(s)" (es. `GHS02 GHS05 Dgr`)
+  - `labelling_h_codes` (TEXT) — "Labelling – Hazard Statement Code(s)" (es. `H225 H319`)
+- Re-import dei 4.441 record dal file CLP Annex VI per popolare le due nuove colonne (i record esistenti vengono aggiornati per `index_no`, non duplicati).
+- `hazard_codes` (Classification) e `gruppo_ped` restano invariati — logica PED non cambia.
 
-The security scan found 8 findings (2 errors, 4 warnings, 2 info). The existing RLS foundation is solid — all tables have RLS enabled, roles are in a separate table, and `has_role()`/`get_user_org_id()` security definer functions exist. Here's what needs hardening:
+### UI
+- `src/components/ClpSubstancesTable.tsx`: due nuove colonne nella tabella ("Pittogrammi", "H-codes etichetta"), mostrate dopo "H-codes" (Classification). Se Labelling ≠ Classification, evidenzio la differenza con badge.
+- `src/pages/Calculator.tsx`: nel dialog di ricerca CLP mostro anche pittogrammi e H-codes di etichetta come informazione aggiuntiva. La selezione continua a popolare il calcolatore con gli H-codes di Classification (logica PED invariata).
+- `src/integrations/supabase/types.ts`: rigenerato automaticamente dopo la migrazione.
 
-### 1. Enable Leaked Password Protection
-Configure auth to reject passwords found in known breach databases.
+### Traduzioni
+- `it / en / es / de`: aggiungo `db.col_pictograms`, `db.col_label_hcodes`, `clp.label_diff_hint`.
 
-### 2. Add Password Protection for Shared Proposals (Error)
-Shared proposals currently expose pricing and content to anyone with the link. Add optional password protection:
-- **Migration**: Add `share_password_hash` column to `proposals` table
-- **Edge function**: `verify-share-password` — accepts share_id + password, returns a signed short-lived token
-- **Update RLS**: Keep existing public SELECT for non-password-protected proposals; password-protected ones require verification through the edge function
-- **Frontend**: Update `PublicProposal.tsx` to show a password gate when `share_password_hash` is set; update `ProposalDetail.tsx` to let users set a share password
-
-### 3. Add Share Link Expiration (Error)
-- **Migration**: Add `share_expires_at` column to `proposals`
-- **Update RLS**: Modify "Anyone can view shared proposals" policy to check `share_expires_at IS NULL OR share_expires_at > now()`
-- **Frontend**: Add expiration date picker in proposal sharing UI
-
-### 4. Restrict Client Contact Info by Role (Warning)
-- Create a view `clients_public` that excludes `email` and `phone` for non-admin/manager users
-- Or add role-based filtering in the application layer since all org members currently see all client fields
-
-### 5. Anonymize IP in Proposal Events (Warning)
-- Truncate IP addresses before storing (remove last octet) in `PublicProposal.tsx`
-- Add a privacy notice to the public proposal page
-
-### 6. Align Proposal Version Access with Proposal Access (Info)
-- **Migration**: Update `proposal_versions` RLS to allow managers/admins to view versions of proposals they can access:
-```sql
-CREATE POLICY "Managers/admins can view org proposal versions"
-ON proposal_versions FOR SELECT
-USING (EXISTS (
-  SELECT 1 FROM proposals
-  WHERE proposals.id = proposal_versions.proposal_id
-  AND proposals.org_id = get_user_org_id(auth.uid())
-  AND (has_role(auth.uid(), 'admin') OR has_role(auth.uid(), 'manager'))
-));
-```
-
-### 7. Add Role Change Audit Logging (Info)
-- **Migration**: Create `audit_logs` table with RLS (admin SELECT only, insert via trigger)
-- **Migration**: Add trigger on `user_roles` for INSERT/UPDATE/DELETE that logs changes to `audit_logs`
-
-### 8. Input Validation & Frontend Security
-- Sanitize all user inputs before database writes (proposal content, client notes)
-- Add rate limiting awareness on auth pages (already handled by backend, but add UI feedback)
-- Ensure no sensitive data in localStorage beyond the session token
-
-### Files to Change
-- **Migrations**: 3-4 migrations for schema changes (share_password_hash, share_expires_at, audit_logs table + trigger, updated RLS policies)
-- **New edge function**: `verify-share-password`
-- **`src/pages/PublicProposal.tsx`**: Password gate, IP anonymization, privacy notice
-- **`src/pages/ProposalDetail.tsx`**: Share password + expiration UI
-- **`src/pages/ProposalBuilder.tsx`**: Share expiration option
-- **Auth config**: Enable leaked password protection
-
+### Cosa NON cambia
+- Logica di calcolo del Gruppo PED.
+- Tabella H-codes, registry, PDF, autenticazione.

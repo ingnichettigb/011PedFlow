@@ -16,6 +16,8 @@ export type ClpRow = {
   cas_no: string | null;
   hazard_codes: string | null;
   gruppo_ped: string;
+  pictograms: string | null;
+  labelling_h_codes: string | null;
 };
 
 const groupVariant = (g: string) => {
@@ -76,6 +78,8 @@ export function ClpSubstancesTable({ onPick }: { onPick?: (row: ClpRow) => void 
                 <TableHead className="font-bold">{t("db.col_cas")}</TableHead>
                 <TableHead className="font-bold">{t("db.col_ec")}</TableHead>
                 <TableHead className="font-bold">{t("db.col_hazards")}</TableHead>
+                <TableHead className="font-bold">{t("db.col_pictograms")}</TableHead>
+                <TableHead className="font-bold">{t("db.col_label_hcodes")}</TableHead>
                 <TableHead className="font-bold">{t("db.col_group")}</TableHead>
                 {onPick && <TableHead></TableHead>}
               </TableRow>
@@ -87,6 +91,13 @@ export function ClpSubstancesTable({ onPick }: { onPick?: (row: ClpRow) => void 
                   <TableCell className="font-mono text-base">{r.cas_no ?? "—"}</TableCell>
                   <TableCell className="font-mono text-base">{r.ec_no ?? "—"}</TableCell>
                   <TableCell className="font-mono text-sm whitespace-pre-wrap">{r.hazard_codes ?? "—"}</TableCell>
+                  <TableCell className="font-mono text-xs whitespace-pre-wrap max-w-[180px]">{r.pictograms ?? "—"}</TableCell>
+                  <TableCell className="font-mono text-sm whitespace-pre-wrap max-w-[200px]">
+                    {r.labelling_h_codes ?? "—"}
+                    {r.labelling_h_codes && r.hazard_codes && r.labelling_h_codes.trim() !== r.hazard_codes.trim() && (
+                      <Badge variant="outline" className="ml-2 text-[10px] border-warning text-warning-foreground">≠</Badge>
+                    )}
+                  </TableCell>
                   <TableCell><Badge className={groupVariant(r.gruppo_ped)}>{r.gruppo_ped}</Badge></TableCell>
                   {onPick && (
                     <TableCell>
