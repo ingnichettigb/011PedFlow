@@ -19,6 +19,8 @@ const de = {
     sub: "Richtlinie 2014/68/EU — Anhang II — SDB-Methode",
     doc_section: "Dokumentdaten",
     fluid_section: "Fluididentifikation",
+    tab_sds: "SDS – Sicherheitsdatenblatt",
+    tab_clp: "Stoffname / CAS",
     sds_section: "SDB – Sicherheitsdatenblatt",
     op_section: "Betriebsbedingungen",
     l001_commessa: "[001] Auftragsnr.",
