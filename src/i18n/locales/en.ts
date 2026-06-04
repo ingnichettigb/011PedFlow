@@ -19,6 +19,8 @@ const en = {
     sub: "Directive 2014/68/EU — Annex II — SDS method",
     doc_section: "Document data",
     fluid_section: "Fluid identification",
+    tab_sds: "SDS – Safety Data Sheet",
+    tab_clp: "Substance name / CAS",
     sds_section: "SDS – Safety Data Sheet",
     op_section: "Operating conditions",
     l001_commessa: "[001] Job no.",
