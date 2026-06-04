@@ -211,47 +211,56 @@ export default function Calculator() {
         </Card>
 
         <Card>
-          <CardHeader><CardTitle className="text-lg">{t("calc.fluid_section")}</CardTitle></CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex flex-wrap items-center gap-3">
-              <Button type="button" variant="outline" size="lg" className="gap-2 h-12 text-base" onClick={() => setClpOpen(true)}>
-                <Search className="h-5 w-5" /> {t("clp.button")}
-              </Button>
-              {clpHint && (
-                <Badge variant="outline" className="text-base h-8 px-3">
-                  {t("clp.found_group")}: {clpHint}
-                </Badge>
-              )}
-            </div>
-            <div className="grid gap-4 md:grid-cols-2">
-            <Field id="f-name" label={t("calc.l005_fluid_name")} value={form.fluidName} onChange={(v) => setForm({ ...form, fluidName: v })} required />
-            <Field id="f-cas" label={t("calc.l006_cas")} value={form.casNo} onChange={(v) => setForm({ ...form, casNo: v })} />
-            <Field id="f-ec" label={t("calc.l007_ec")} value={form.ecNo} onChange={(v) => setForm({ ...form, ecNo: v })} />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
           <CardHeader><CardTitle className="text-lg">{t("calc.op_section")}</CardTitle></CardHeader>
-          <CardContent className="grid gap-4 md:grid-cols-3">
+          <CardContent className="grid gap-4 md:grid-cols-2">
             <Field id="f-tmin" label={t("calc.l008_tmin")} value={form.tMin} onChange={(v) => setForm({ ...form, tMin: v })} type="number" />
             <Field id="f-tmax" label={t("calc.l009_tmax")} value={form.tMax} onChange={(v) => setForm({ ...form, tMax: v })} type="number" />
-            <div>
-              <Field id="f-fp" label={t("calc.l010_fp")} value={form.flashPoint} onChange={(v) => setForm({ ...form, flashPoint: v })} type="number" />
-              <p className="text-xs text-muted-foreground mt-1">{t("calc.fp_optional")}</p>
-            </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader><CardTitle className="text-lg">{t("calc.sds_section")} — {t("calc.l011_h")}</CardTitle></CardHeader>
-          <CardContent className="grid gap-3 grid-cols-2 md:grid-cols-4">
-            {form.hCodes.map((c, i) => (
-              <div key={i}>
-                <Label htmlFor={`h-${i}`} className="text-sm font-semibold">{`H${String(i + 1).padStart(2, "0")}`}</Label>
-                <Input id={`h-${i}`} value={c} onChange={(e) => setHCode(i, e.target.value)} placeholder={t("calc.l012_h_placeholder")} className="h-11 text-base font-mono uppercase" />
-              </div>
-            ))}
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg">{t("calc.fluid_section")}</CardTitle>
+            {clpHint && (
+              <Badge variant="outline" className="text-base h-8 px-3 w-fit mt-2">
+                {t("clp.found_group")}: {clpHint}
+              </Badge>
+            )}
+          </CardHeader>
+          <CardContent>
+            <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "sds" | "clp")} className="w-full">
+              <TabsList className="h-12">
+                <TabsTrigger value="sds" className="text-base h-10 px-4">{t("calc.tab_sds")}</TabsTrigger>
+                <TabsTrigger value="clp" className="text-base h-10 px-4">{t("calc.tab_clp")}</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="sds" className="mt-4 space-y-6">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <Field id="f-name" label={t("calc.l005_fluid_name")} value={form.fluidName} onChange={(v) => setForm({ ...form, fluidName: v })} required />
+                  <Field id="f-cas" label={t("calc.l006_cas")} value={form.casNo} onChange={(v) => setForm({ ...form, casNo: v })} />
+                  <Field id="f-ec" label={t("calc.l007_ec")} value={form.ecNo} onChange={(v) => setForm({ ...form, ecNo: v })} />
+                  <div>
+                    <Field id="f-fp" label={t("calc.l010_fp")} value={form.flashPoint} onChange={(v) => setForm({ ...form, flashPoint: v })} type="number" />
+                    <p className="text-xs text-muted-foreground mt-1">{t("calc.fp_optional")}</p>
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-base font-semibold mb-3">{t("calc.l011_h")}</h3>
+                  <div className="grid gap-3 grid-cols-2 md:grid-cols-4">
+                    {form.hCodes.map((c, i) => (
+                      <div key={i}>
+                        <Label htmlFor={`h-${i}`} className="text-sm font-semibold">{`H${String(i + 1).padStart(2, "0")}`}</Label>
+                        <Input id={`h-${i}`} value={c} onChange={(e) => setHCode(i, e.target.value)} placeholder={t("calc.l012_h_placeholder")} className="h-11 text-base font-mono uppercase" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="clp" className="mt-4">
+                <ClpSubstancesTable onPick={handlePickClp} />
+              </TabsContent>
+            </Tabs>
           </CardContent>
         </Card>
 
@@ -301,14 +310,6 @@ export default function Calculator() {
         )}
       </div>
 
-      <Dialog open={clpOpen} onOpenChange={setClpOpen}>
-        <DialogContent className="max-w-5xl">
-          <DialogHeader><DialogTitle>{t("clp.dialog_title")}</DialogTitle></DialogHeader>
-          <div className="max-h-[70vh] overflow-y-auto">
-            <ClpSubstancesTable onPick={handlePickClp} />
-          </div>
-        </DialogContent>
-      </Dialog>
     </AppLayout>
   );
 }
