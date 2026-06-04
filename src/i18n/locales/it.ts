@@ -114,6 +114,8 @@ const it = {
     col_ec: "EC",
     col_hazards: "Codici H",
     col_index: "Index No",
+    col_pictograms: "Pittogrammi",
+    col_label_hcodes: "H etichetta",
   },
   clp: {
     button: "[018] Cerca fluido nel database CLP",
