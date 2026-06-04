@@ -17,7 +17,7 @@ import type { Json } from "@/integrations/supabase/types";
 import { useAuth } from "@/contexts/AuthContext";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ClpSubstancesTable, type ClpRow } from "@/components/ClpSubstancesTable";
-import { Search } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const H_SLOTS = 12;
 
@@ -54,8 +54,8 @@ export default function Calculator() {
   const [result, setResult] = useState<ClassificationResult | null>(null);
   const [loadId, setLoadId] = useState<string | null>(id ?? null);
   const [saving, setSaving] = useState(false);
-  const [clpOpen, setClpOpen] = useState(false);
   const [clpHint, setClpHint] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<"sds" | "clp">("sds");
 
   // Load existing or duplicate
   useEffect(() => {
@@ -127,7 +127,7 @@ export default function Calculator() {
       hCodes: padded,
     }));
     setClpHint(row.gruppo_ped);
-    setClpOpen(false);
+    setActiveTab("sds");
     toast.success(t("clp.imported"));
   };
 
