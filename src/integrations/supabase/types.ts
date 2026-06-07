@@ -94,7 +94,10 @@ export type Database = {
       }
       h_codes_db: {
         Row: {
+          avvertenza: string | null
           categoria: string
+          categoria_clp: string | null
+          classe_pericolo: string | null
           codice: string
           created_at: string
           created_by: string | null
@@ -102,9 +105,13 @@ export type Database = {
           gruppo_ped: string
           id: string
           updated_at: string
+          voce_ped: string | null
         }
         Insert: {
+          avvertenza?: string | null
           categoria: string
+          categoria_clp?: string | null
+          classe_pericolo?: string | null
           codice: string
           created_at?: string
           created_by?: string | null
@@ -112,9 +119,13 @@ export type Database = {
           gruppo_ped: string
           id?: string
           updated_at?: string
+          voce_ped?: string | null
         }
         Update: {
+          avvertenza?: string | null
           categoria?: string
+          categoria_clp?: string | null
+          classe_pericolo?: string | null
           codice?: string
           created_at?: string
           created_by?: string | null
@@ -122,6 +133,7 @@ export type Database = {
           gruppo_ped?: string
           id?: string
           updated_at?: string
+          voce_ped?: string | null
         }
         Relationships: []
       }
