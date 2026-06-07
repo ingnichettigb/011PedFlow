@@ -118,6 +118,10 @@ const es = {
     col_index: "Index No",
     col_pictograms: "Pictogramas",
     col_label_hcodes: "Códigos H etiqueta",
+    col_hazard_class: "Clase de peligro",
+    col_clp_category: "Categoría CLP",
+    col_signal_word: "Palabra de advertencia",
+    col_ped_entry: "Voz PED",
   },
   clp: {
     button: "[018] Buscar fluido en la base CLP",
