@@ -1,0 +1,5 @@
+ALTER TABLE public.h_codes_db
+  ADD COLUMN IF NOT EXISTS classe_pericolo TEXT,
+  ADD COLUMN IF NOT EXISTS categoria_clp TEXT,
+  ADD COLUMN IF NOT EXISTS avvertenza TEXT,
+  ADD COLUMN IF NOT EXISTS voce_ped TEXT;

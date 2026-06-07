@@ -118,6 +118,10 @@ const en = {
     col_index: "Index No",
     col_pictograms: "Pictograms",
     col_label_hcodes: "Label H-codes",
+    col_hazard_class: "Hazard class",
+    col_clp_category: "CLP category",
+    col_signal_word: "Signal word",
+    col_ped_entry: "PED entry",
   },
   clp: {
     button: "[018] Search fluid in CLP database",
