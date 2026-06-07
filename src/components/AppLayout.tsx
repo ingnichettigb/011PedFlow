@@ -8,6 +8,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { Calculator, BookMarked, LogOut, User, Menu, Globe, Database } from "lucide-react";
 import { cn } from "@/lib/utils";
 import pedflowLogo from "@/assets/pedflow-logo.png.asset.json";
+import { AppInfoButton } from "@/components/AppInfoButton";
 
 const LANGS = [
   { code: "it", label: "Italiano" },
@@ -62,6 +63,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           </nav>
 
           <div className="flex items-center gap-2 ml-auto md:ml-0">
+            <AppInfoButton />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" className="h-11 gap-2" aria-label={t("nav.language")}>
