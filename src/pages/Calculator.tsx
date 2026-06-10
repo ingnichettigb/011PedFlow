@@ -26,6 +26,7 @@ type HCodeDetail = {
   descrizione: string | null;
   categoria_clp: string | null;
   avvertenza: string | null;
+  voce_ped: string | null;
 };
 
 type FormState = {
@@ -121,10 +122,10 @@ export default function Calculator() {
     if (codes.length === 0) { setHDetails([]); return; }
     const { data } = await supabase
       .from("h_codes_db")
-      .select("codice, classe_pericolo, descrizione, categoria_clp, avvertenza")
+      .select("codice, classe_pericolo, descrizione, categoria_clp, avvertenza, voce_ped")
       .in("codice", codes);
     const map = new Map((data ?? []).map((d: any) => [d.codice, d]));
-    setHDetails(codes.map((c) => map.get(c) ?? { codice: c, classe_pericolo: null, descrizione: null, categoria_clp: null, avvertenza: null }));
+    setHDetails(codes.map((c) => map.get(c) ?? { codice: c, classe_pericolo: null, descrizione: null, categoria_clp: null, avvertenza: null, voce_ped: null }));
   };
 
   const handleReset = () => { setForm(emptyForm()); setResult(null); setHDetails([]); setLoadId(null); navigate("/calcolatore"); };
@@ -332,6 +333,7 @@ export default function Calculator() {
                         <th className="text-left p-2 font-semibold">{t("db.col_description")}</th>
                         <th className="text-left p-2 font-semibold">{t("db.col_clp_category")}</th>
                         <th className="text-left p-2 font-semibold">{t("db.col_signal_word")}</th>
+                        <th className="text-left p-2 font-semibold">{t("db.col_ped_entry")}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -342,6 +344,7 @@ export default function Calculator() {
                           <td className="p-2">{d.descrizione ?? "—"}</td>
                           <td className="p-2">{d.categoria_clp ?? "—"}</td>
                           <td className="p-2">{d.avvertenza ?? "—"}</td>
+                          <td className="p-2 font-mono">{d.voce_ped ?? "—"}</td>
                         </tr>
                       ))}
                     </tbody>
