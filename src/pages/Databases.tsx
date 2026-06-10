@@ -154,12 +154,12 @@ export default function Databases() {
                 <TableHeader>
                   <TableRow>
                     <TableHead className="font-bold">{t("db.col_code")}</TableHead>
+                    <TableHead className="font-bold">{t("db.col_group")}</TableHead>
                     <TableHead className="font-bold">{t("db.col_hazard_class")}</TableHead>
                     <TableHead className="font-bold">{t("db.col_description")}</TableHead>
                     <TableHead className="font-bold">{t("db.col_clp_category")}</TableHead>
                     <TableHead className="font-bold">{t("db.col_signal_word")}</TableHead>
                     <TableHead className="font-bold">{t("db.col_ped_entry")}</TableHead>
-                    <TableHead className="font-bold">{t("db.col_group")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
