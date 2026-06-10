@@ -145,7 +145,7 @@ export default function Databases() {
               <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("db.search")} className="pl-10 h-11 text-base" />
             </div>
           </CardHeader>
-          <CardContent className="overflow-x-auto">
+          <CardContent className="max-h-[65vh] overflow-auto">
             {loading ? (
               <p className="py-8 text-center text-muted-foreground">{t("common.loading")}</p>
             ) : filtered.length === 0 ? (
