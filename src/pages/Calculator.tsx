@@ -322,6 +322,32 @@ export default function Calculator() {
                   {buildRationale(result)}
                 </AlertDescription>
               </Alert>
+              {hDetails.length > 0 && (
+                <div className="rounded-md border overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead className="bg-muted">
+                      <tr>
+                        <th className="text-left p-2 font-semibold">{t("db.col_code")}</th>
+                        <th className="text-left p-2 font-semibold">{t("db.col_hazard_class")}</th>
+                        <th className="text-left p-2 font-semibold">{t("db.col_description")}</th>
+                        <th className="text-left p-2 font-semibold">{t("db.col_clp_category")}</th>
+                        <th className="text-left p-2 font-semibold">{t("db.col_signal_word")}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {hDetails.map((d) => (
+                        <tr key={d.codice} className="border-t">
+                          <td className="p-2 font-mono font-semibold">{d.codice}</td>
+                          <td className="p-2">{d.classe_pericolo ?? "—"}</td>
+                          <td className="p-2">{d.descrizione ?? "—"}</td>
+                          <td className="p-2">{d.categoria_clp ?? "—"}</td>
+                          <td className="p-2">{d.avvertenza ?? "—"}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </CardContent>
           </Card>
         )}
