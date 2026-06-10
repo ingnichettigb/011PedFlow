@@ -20,6 +20,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const H_SLOTS = 12;
 
+type HCodeDetail = {
+  codice: string;
+  classe_pericolo: string | null;
+  descrizione: string | null;
+  categoria_clp: string | null;
+  avvertenza: string | null;
+};
+
 type FormState = {
   commessa: string; cliente: string; progetto: string; numeroDisegno: string;
   fluidName: string; casNo: string; ecNo: string;
@@ -55,6 +63,7 @@ export default function Calculator() {
   const [saving, setSaving] = useState(false);
   const [clpHint, setClpHint] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"sds" | "clp">("sds");
+  const [hDetails, setHDetails] = useState<HCodeDetail[]>([]);
 
   // Load existing or duplicate
   useEffect(() => {
@@ -104,12 +113,21 @@ export default function Calculator() {
     return classify({ hCodes: cleanCodes, flashPoint: fp, tMin: tmin, tMax: tmax });
   };
 
-  const handleCalculate = () => {
+  const handleCalculate = async () => {
     const r = buildAndValidate();
-    if (r) setResult(r);
+    if (!r) return;
+    setResult(r);
+    const codes = form.hCodes.map((c) => c.trim().toUpperCase()).filter(Boolean);
+    if (codes.length === 0) { setHDetails([]); return; }
+    const { data } = await supabase
+      .from("h_codes_db")
+      .select("codice, classe_pericolo, descrizione, categoria_clp, avvertenza")
+      .in("codice", codes);
+    const map = new Map((data ?? []).map((d: any) => [d.codice, d]));
+    setHDetails(codes.map((c) => map.get(c) ?? { codice: c, classe_pericolo: null, descrizione: null, categoria_clp: null, avvertenza: null }));
   };
 
-  const handleReset = () => { setForm(emptyForm()); setResult(null); setLoadId(null); navigate("/calcolatore"); };
+  const handleReset = () => { setForm(emptyForm()); setResult(null); setHDetails([]); setLoadId(null); navigate("/calcolatore"); };
 
   const handlePickClp = (row: ClpRow) => {
     const codes = (row.hazard_codes ?? "")
