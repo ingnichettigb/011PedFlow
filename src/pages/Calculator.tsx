@@ -20,6 +20,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const H_SLOTS = 12;
 
+type HCodeDetail = {
+  codice: string;
+  classe_pericolo: string | null;
+  descrizione: string | null;
+  categoria_clp: string | null;
+  avvertenza: string | null;
+};
+
 type FormState = {
   commessa: string; cliente: string; progetto: string; numeroDisegno: string;
   fluidName: string; casNo: string; ecNo: string;
@@ -55,6 +63,7 @@ export default function Calculator() {
   const [saving, setSaving] = useState(false);
   const [clpHint, setClpHint] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"sds" | "clp">("sds");
+  const [hDetails, setHDetails] = useState<HCodeDetail[]>([]);
 
   // Load existing or duplicate
   useEffect(() => {
@@ -104,12 +113,21 @@ export default function Calculator() {
     return classify({ hCodes: cleanCodes, flashPoint: fp, tMin: tmin, tMax: tmax });
   };
 
-  const handleCalculate = () => {
+  const handleCalculate = async () => {
     const r = buildAndValidate();
-    if (r) setResult(r);
+    if (!r) return;
+    setResult(r);
+    const codes = form.hCodes.map((c) => c.trim().toUpperCase()).filter(Boolean);
+    if (codes.length === 0) { setHDetails([]); return; }
+    const { data } = await supabase
+      .from("h_codes_db")
+      .select("codice, classe_pericolo, descrizione, categoria_clp, avvertenza")
+      .in("codice", codes);
+    const map = new Map((data ?? []).map((d: any) => [d.codice, d]));
+    setHDetails(codes.map((c) => map.get(c) ?? { codice: c, classe_pericolo: null, descrizione: null, categoria_clp: null, avvertenza: null }));
   };
 
-  const handleReset = () => { setForm(emptyForm()); setResult(null); setLoadId(null); navigate("/calcolatore"); };
+  const handleReset = () => { setForm(emptyForm()); setResult(null); setHDetails([]); setLoadId(null); navigate("/calcolatore"); };
 
   const handlePickClp = (row: ClpRow) => {
     const codes = (row.hazard_codes ?? "")
@@ -304,6 +322,32 @@ export default function Calculator() {
                   {buildRationale(result)}
                 </AlertDescription>
               </Alert>
+              {hDetails.length > 0 && (
+                <div className="rounded-md border overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead className="bg-muted">
+                      <tr>
+                        <th className="text-left p-2 font-semibold">{t("db.col_code")}</th>
+                        <th className="text-left p-2 font-semibold">{t("db.col_hazard_class")}</th>
+                        <th className="text-left p-2 font-semibold">{t("db.col_description")}</th>
+                        <th className="text-left p-2 font-semibold">{t("db.col_clp_category")}</th>
+                        <th className="text-left p-2 font-semibold">{t("db.col_signal_word")}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {hDetails.map((d) => (
+                        <tr key={d.codice} className="border-t">
+                          <td className="p-2 font-mono font-semibold">{d.codice}</td>
+                          <td className="p-2">{d.classe_pericolo ?? "—"}</td>
+                          <td className="p-2">{d.descrizione ?? "—"}</td>
+                          <td className="p-2">{d.categoria_clp ?? "—"}</td>
+                          <td className="p-2">{d.avvertenza ?? "—"}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </CardContent>
           </Card>
         )}
