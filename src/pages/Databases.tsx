@@ -154,24 +154,24 @@ export default function Databases() {
                 <TableHeader>
                   <TableRow>
                     <TableHead className="font-bold">{t("db.col_code")}</TableHead>
+                    <TableHead className="font-bold">{t("db.col_group")}</TableHead>
                     <TableHead className="font-bold">{t("db.col_hazard_class")}</TableHead>
                     <TableHead className="font-bold">{t("db.col_description")}</TableHead>
                     <TableHead className="font-bold">{t("db.col_clp_category")}</TableHead>
                     <TableHead className="font-bold">{t("db.col_signal_word")}</TableHead>
                     <TableHead className="font-bold">{t("db.col_ped_entry")}</TableHead>
-                    <TableHead className="font-bold">{t("db.col_group")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filtered.map((r) => (
                     <TableRow key={r.id}>
                       <TableCell className="font-mono font-bold text-base">{r.codice}</TableCell>
+                      <TableCell><Badge className={groupVariant(r.gruppo_ped)}>{r.gruppo_ped}</Badge></TableCell>
                       <TableCell className="text-base">{r.classe_pericolo ?? r.categoria}</TableCell>
                       <TableCell className="text-base">{r.descrizione}</TableCell>
                       <TableCell className="text-base">{r.categoria_clp ?? "—"}</TableCell>
                       <TableCell className="text-base">{r.avvertenza ?? "—"}</TableCell>
                       <TableCell className="text-base font-mono">{r.voce_ped ?? "—"}</TableCell>
-                      <TableCell><Badge className={groupVariant(r.gruppo_ped)}>{r.gruppo_ped}</Badge></TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
