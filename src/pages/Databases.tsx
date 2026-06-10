@@ -29,6 +29,7 @@ type HCodeRow = {
 };
 
 const groupVariant = (g: string) => {
+  if (g.includes("*")) return "bg-orange-500 text-white";
   if (g.startsWith("Gruppo 1")) return "bg-destructive text-destructive-foreground";
   if (g.startsWith("Gruppo 2")) return "bg-success text-success-foreground";
   return "bg-warning/20 text-warning-foreground border border-warning";
