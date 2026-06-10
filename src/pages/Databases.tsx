@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AppLayout } from "@/components/AppLayout";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Plus, Search, Database as DatabaseIcon } from "lucide-react";
+import { Plus, Search, Database as DatabaseIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { validateHCode } from "@/lib/pedLogic";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -43,6 +43,8 @@ export default function Databases() {
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({ codice: "", categoria: "", descrizione: "", gruppo_ped: "Gruppo 1" });
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const scrollBy = (dx: number) => scrollRef.current?.scrollBy({ left: dx, behavior: "smooth" });
 
   const load = async () => {
     setLoading(true);
@@ -145,7 +147,24 @@ export default function Databases() {
               <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("db.search")} className="pl-10 h-11 text-base" />
             </div>
           </CardHeader>
-          <CardContent className="max-h-[65vh] overflow-auto">
+          <CardContent className="relative p-0">
+            <button
+              type="button"
+              aria-label="scroll left"
+              onClick={() => scrollBy(-240)}
+              className="absolute left-1 top-1/2 -translate-y-1/2 z-20 h-10 w-10 rounded-full bg-background/90 border shadow flex items-center justify-center hover:bg-accent"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <button
+              type="button"
+              aria-label="scroll right"
+              onClick={() => scrollBy(240)}
+              className="absolute right-1 top-1/2 -translate-y-1/2 z-20 h-10 w-10 rounded-full bg-background/90 border shadow flex items-center justify-center hover:bg-accent"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
+            <div ref={scrollRef} className="max-h-[65vh] overflow-auto px-6 py-4">
             {loading ? (
               <p className="py-8 text-center text-muted-foreground">{t("common.loading")}</p>
             ) : filtered.length === 0 ? (
@@ -179,6 +198,7 @@ export default function Databases() {
               </Table>
             )}
             <p className="text-xs text-muted-foreground mt-3">{t("db.count", { n: filtered.length })}</p>
+            </div>
           </CardContent>
         </Card>
           </TabsContent>
