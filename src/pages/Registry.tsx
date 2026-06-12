@@ -38,7 +38,17 @@ export default function Registry() {
     setRows(rows.filter((r) => r.id !== id));
   };
 
-  const handlePdf = (r: Row) => {
+  const handlePdf = async (r: Row) => {
+    const codes = r.h_codes ?? [];
+    let hDetails: any[] = [];
+    if (codes.length > 0) {
+      const { data } = await supabase
+        .from("h_codes_db")
+        .select("codice, classe_pericolo, descrizione, categoria_clp, avvertenza, voce_ped")
+        .in("codice", codes);
+      const map = new Map((data ?? []).map((d: any) => [d.codice, d]));
+      hDetails = codes.map((c) => map.get(c) ?? { codice: c, classe_pericolo: null, descrizione: null, categoria_clp: null, avvertenza: null, voce_ped: null });
+    }
     const pdf = generatePedPdf({
       commessa: r.commessa ?? undefined, cliente: r.cliente ?? undefined, progetto: r.progetto ?? undefined,
       numeroDisegno: r.numero_disegno ?? undefined, fluidName: r.fluid_name,
@@ -48,7 +58,7 @@ export default function Registry() {
       tMin: r.t_min != null ? Number(r.t_min) : null,
       tMax: r.t_max != null ? Number(r.t_max) : null,
       baseGroup: r.base_group as 1 | 2, finalGroup: r.final_group as 1 | 2,
-      art13Applied: r.art13_applied, rationale: r.rationale,
+      art13Applied: r.art13_applied, rationale: r.rationale, hDetails,
     }, t, i18n.language);
     pdf.save(`PED_${r.fluid_name.replace(/[^a-z0-9]+/gi, "_")}.pdf`);
   };
