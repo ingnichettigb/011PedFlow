@@ -18,6 +18,14 @@ export interface PdfData {
   finalGroup: 1 | 2;
   art13Applied: boolean;
   rationale: string;
+  hDetails?: Array<{
+    codice: string;
+    classe_pericolo: string | null;
+    descrizione: string | null;
+    categoria_clp: string | null;
+    avvertenza: string | null;
+    voce_ped: string | null;
+  }>;
 }
 
 export function generatePedPdf(data: PdfData, t: TFunction, lang: string): jsPDF {
@@ -98,6 +106,38 @@ export function generatePedPdf(data: PdfData, t: TFunction, lang: string): jsPDF
     doc.setFont("helvetica", "normal");
     doc.text(data.determiningCodes.join(", "), M + 62, y);
     y += 7;
+  }
+
+  // H code details table
+  if (data.hDetails && data.hDetails.length > 0) {
+    y += 2;
+    if (y > 250) { doc.addPage(); y = M; }
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    const cols = [
+      { label: t("db.col_code"), w: 18 },
+      { label: t("db.col_hazard_class"), w: 32 },
+      { label: t("db.col_description"), w: 60 },
+      { label: t("db.col_clp_category"), w: 26 },
+      { label: t("db.col_signal_word"), w: 22 },
+      { label: t("db.col_ped_entry"), w: 16 },
+    ];
+    doc.setFillColor(241, 245, 249);
+    doc.rect(M, y - 4, W - 2 * M, 6, "F");
+    let x = M + 1;
+    cols.forEach((c) => { doc.text(c.label, x, y); x += c.w; });
+    y += 4;
+    doc.setFont("helvetica", "normal");
+    data.hDetails.forEach((d) => {
+      const vals = [d.codice, d.classe_pericolo ?? "—", d.descrizione ?? "—", d.categoria_clp ?? "—", d.avvertenza ?? "—", d.voce_ped ?? "—"];
+      const wrapped = vals.map((v, i) => doc.splitTextToSize(String(v), cols[i].w - 2));
+      const rowH = Math.max(...wrapped.map((w) => w.length)) * 4 + 2;
+      if (y + rowH > 280) { doc.addPage(); y = M; }
+      x = M + 1;
+      wrapped.forEach((w, i) => { doc.text(w, x, y); x += cols[i].w; });
+      y += rowH;
+    });
+    doc.setFontSize(10);
   }
 
   // Section: Result
