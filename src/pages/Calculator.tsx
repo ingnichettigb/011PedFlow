@@ -163,6 +163,18 @@ export default function Calculator() {
     const tmax = numOrNull(form.tMax);
     const rationale = buildRationale(r);
 
+    // Always fetch fresh H code details so the saved PDF includes the technical table
+    let details = hDetails;
+    if (cleanCodes.length > 0 && details.length === 0) {
+      const { data: dd } = await supabase
+        .from("h_codes_db")
+        .select("codice, classe_pericolo, descrizione, categoria_clp, avvertenza, voce_ped")
+        .in("codice", cleanCodes);
+      const map = new Map((dd ?? []).map((d: any) => [d.codice, d]));
+      details = cleanCodes.map((c) => map.get(c) ?? { codice: c, classe_pericolo: null, descrizione: null, categoria_clp: null, avvertenza: null, voce_ped: null });
+      setHDetails(details);
+    }
+
     const payload = {
       user_id: user!.id,
       commessa: form.commessa || null,
@@ -203,6 +215,7 @@ export default function Calculator() {
       flashPoint: fp, tMin: tmin, tMax: tmax,
       baseGroup: r.baseGroup, finalGroup: r.finalGroup, art13Applied: r.art13Applied,
       rationale,
+      hDetails: details,
     }, t, i18n.language);
     pdf.save(`PED_${(form.fluidName || "fluid").replace(/[^a-z0-9]+/gi, "_")}.pdf`);
 
@@ -265,12 +278,24 @@ export default function Calculator() {
                 <div>
                   <h3 className="text-base font-semibold mb-3">{t("calc.l011_h")}</h3>
                   <div className="grid gap-3 grid-cols-2 md:grid-cols-4">
-                    {form.hCodes.map((c, i) => (
-                      <div key={i}>
-                        <Label htmlFor={`h-${i}`} className="text-sm font-semibold">{`H${String(i + 1).padStart(2, "0")}`}</Label>
-                        <Input id={`h-${i}`} value={c} onChange={(e) => setHCode(i, e.target.value)} placeholder={t("calc.l012_h_placeholder")} className="h-11 text-base font-mono uppercase" />
-                      </div>
-                    ))}
+                    {form.hCodes.map((c, i) => {
+                      const firstFour = form.hCodes.slice(0, 4).every((x) => x.trim() !== "");
+                      const firstEight = form.hCodes.slice(0, 8).every((x) => x.trim() !== "");
+                      const disabled = (i >= 4 && i < 8 && !firstFour) || (i >= 8 && !firstEight);
+                      return (
+                        <div key={i}>
+                          <Label htmlFor={`h-${i}`} className="text-sm font-semibold">{`H${String(i + 1).padStart(2, "0")}`}</Label>
+                          <Input
+                            id={`h-${i}`}
+                            value={c}
+                            onChange={(e) => setHCode(i, e.target.value)}
+                            placeholder={t("calc.l012_h_placeholder")}
+                            disabled={disabled}
+                            className="h-11 text-base font-mono uppercase disabled:opacity-50 disabled:cursor-not-allowed"
+                          />
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               </TabsContent>
