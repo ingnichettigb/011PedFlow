@@ -164,7 +164,8 @@ export default function Databases() {
             >
               <ChevronRight className="h-5 w-5" />
             </button>
-            <div ref={scrollRef} className="max-h-[65vh] overflow-auto px-6 py-4">
+            <div ref={scrollRef} className="overflow-x-auto px-6 py-4">
+              <div className="max-h-[65vh] overflow-y-auto min-w-max">
             {loading ? (
               <p className="py-8 text-center text-muted-foreground">{t("common.loading")}</p>
             ) : filtered.length === 0 ? (
@@ -197,7 +198,8 @@ export default function Databases() {
                 </TableBody>
               </Table>
             )}
-            <p className="text-xs text-muted-foreground mt-3">{t("db.count", { n: filtered.length })}</p>
+              </div>
+              <p className="text-xs text-muted-foreground mt-3">{t("db.count", { n: filtered.length })}</p>
             </div>
           </CardContent>
         </Card>
