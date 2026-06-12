@@ -265,12 +265,24 @@ export default function Calculator() {
                 <div>
                   <h3 className="text-base font-semibold mb-3">{t("calc.l011_h")}</h3>
                   <div className="grid gap-3 grid-cols-2 md:grid-cols-4">
-                    {form.hCodes.map((c, i) => (
-                      <div key={i}>
-                        <Label htmlFor={`h-${i}`} className="text-sm font-semibold">{`H${String(i + 1).padStart(2, "0")}`}</Label>
-                        <Input id={`h-${i}`} value={c} onChange={(e) => setHCode(i, e.target.value)} placeholder={t("calc.l012_h_placeholder")} className="h-11 text-base font-mono uppercase" />
-                      </div>
-                    ))}
+                    {form.hCodes.map((c, i) => {
+                      const firstFour = form.hCodes.slice(0, 4).every((x) => x.trim() !== "");
+                      const firstEight = form.hCodes.slice(0, 8).every((x) => x.trim() !== "");
+                      const disabled = (i >= 4 && i < 8 && !firstFour) || (i >= 8 && !firstEight);
+                      return (
+                        <div key={i}>
+                          <Label htmlFor={`h-${i}`} className="text-sm font-semibold">{`H${String(i + 1).padStart(2, "0")}`}</Label>
+                          <Input
+                            id={`h-${i}`}
+                            value={c}
+                            onChange={(e) => setHCode(i, e.target.value)}
+                            placeholder={t("calc.l012_h_placeholder")}
+                            disabled={disabled}
+                            className="h-11 text-base font-mono uppercase disabled:opacity-50 disabled:cursor-not-allowed"
+                          />
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               </TabsContent>
