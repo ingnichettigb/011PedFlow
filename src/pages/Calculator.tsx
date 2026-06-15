@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { AppLayout } from "@/components/AppLayout";
@@ -65,6 +65,17 @@ export default function Calculator() {
   const [clpHint, setClpHint] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"sds" | "clp">("sds");
   const [hDetails, setHDetails] = useState<HCodeDetail[]>([]);
+  const [orgId, setOrgId] = useState<string | null>(null);
+  const resultRef = useRef<HTMLDivElement | null>(null);
+
+  // Load org_id from profile
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      const { data } = await supabase.from("profiles").select("org_id").eq("user_id", user.id).maybeSingle();
+      setOrgId(data?.org_id ?? null);
+    })();
+  }, [user]);
 
   // Load existing or duplicate
   useEffect(() => {
@@ -119,13 +130,19 @@ export default function Calculator() {
     if (!r) return;
     setResult(r);
     const codes = form.hCodes.map((c) => c.trim().toUpperCase()).filter(Boolean);
-    if (codes.length === 0) { setHDetails([]); return; }
-    const { data } = await supabase
-      .from("h_codes_db")
-      .select("codice, classe_pericolo, descrizione, categoria_clp, avvertenza, voce_ped")
-      .in("codice", codes);
-    const map = new Map((data ?? []).map((d: any) => [d.codice, d]));
-    setHDetails(codes.map((c) => map.get(c) ?? { codice: c, classe_pericolo: null, descrizione: null, categoria_clp: null, avvertenza: null, voce_ped: null }));
+    if (codes.length === 0) {
+      setHDetails([]);
+    } else {
+      const { data } = await supabase
+        .from("h_codes_db")
+        .select("codice, classe_pericolo, descrizione, categoria_clp, avvertenza, voce_ped")
+        .in("codice", codes);
+      const map = new Map((data ?? []).map((d: any) => [d.codice, d]));
+      setHDetails(codes.map((c) => map.get(c) ?? { codice: c, classe_pericolo: null, descrizione: null, categoria_clp: null, avvertenza: null, voce_ped: null }));
+    }
+    requestAnimationFrame(() => {
+      resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
   };
 
   const handleReset = () => { setForm(emptyForm()); setResult(null); setHDetails([]); setLoadId(null); navigate("/calcolatore"); };
@@ -175,8 +192,21 @@ export default function Calculator() {
       setHDetails(details);
     }
 
+    let effectiveOrgId = orgId;
+    if (!effectiveOrgId && user) {
+      const { data: prof } = await supabase.from("profiles").select("org_id").eq("user_id", user.id).maybeSingle();
+      effectiveOrgId = prof?.org_id ?? null;
+      if (effectiveOrgId) setOrgId(effectiveOrgId);
+    }
+    if (!effectiveOrgId) {
+      toast.error("Organizzazione non trovata per l'utente. Impossibile salvare.");
+      setSaving(false);
+      return;
+    }
+
     const payload = {
       user_id: user!.id,
+      org_id: effectiveOrgId,
       commessa: form.commessa || null,
       cliente: form.cliente || null,
       progetto: form.progetto || null,
