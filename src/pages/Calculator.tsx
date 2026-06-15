@@ -105,6 +105,11 @@ export default function Calculator() {
   const setHCode = (i: number, v: string) => {
     const next = [...form.hCodes];
     next[i] = v;
+    // If a row becomes incomplete, clear the dependent rows below
+    const firstFour = next.slice(0, 4).every((x) => x.trim() !== "");
+    const firstEight = firstFour && next.slice(4, 8).every((x) => x.trim() !== "");
+    if (!firstFour) for (let k = 4; k < 12; k++) next[k] = "";
+    else if (!firstEight) for (let k = 8; k < 12; k++) next[k] = "";
     setForm({ ...form, hCodes: next });
   };
 
