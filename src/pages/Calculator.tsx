@@ -307,26 +307,33 @@ export default function Calculator() {
                 </div>
                 <div>
                   <h3 className="text-base font-semibold mb-3">{t("calc.l011_h")}</h3>
-                  <div className="grid gap-3 grid-cols-2 md:grid-cols-4">
-                    {form.hCodes.map((c, i) => {
-                      const firstFour = form.hCodes.slice(0, 4).every((x) => x.trim() !== "");
-                      const firstEight = form.hCodes.slice(0, 8).every((x) => x.trim() !== "");
-                      const disabled = (i >= 4 && i < 8 && !firstFour) || (i >= 8 && !firstEight);
-                      return (
-                        <div key={i}>
-                          <Label htmlFor={`h-${i}`} className="text-sm font-semibold">{`H${String(i + 1).padStart(2, "0")}`}</Label>
-                          <Input
-                            id={`h-${i}`}
-                            value={c}
-                            onChange={(e) => setHCode(i, e.target.value)}
-                            placeholder={t("calc.l012_h_placeholder")}
-                            disabled={disabled}
-                            className="h-11 text-base font-mono uppercase disabled:opacity-50 disabled:cursor-not-allowed"
-                          />
-                        </div>
-                      );
-                    })}
-                  </div>
+                  {(() => {
+                    const firstFour = form.hCodes.slice(0, 4).every((x) => x.trim() !== "");
+                    const firstEight = firstFour && form.hCodes.slice(4, 8).every((x) => x.trim() !== "");
+                    const rows: number[][] = [[0, 1, 2, 3]];
+                    if (firstFour) rows.push([4, 5, 6, 7]);
+                    if (firstEight) rows.push([8, 9, 10, 11]);
+                    return (
+                      <div className="space-y-3">
+                        {rows.map((row, rIdx) => (
+                          <div key={rIdx} className="grid gap-3 grid-cols-2 md:grid-cols-4">
+                            {row.map((i) => (
+                              <div key={i}>
+                                <Label htmlFor={`h-${i}`} className="text-sm font-semibold">{`H${String(i + 1).padStart(2, "0")}`}</Label>
+                                <Input
+                                  id={`h-${i}`}
+                                  value={form.hCodes[i]}
+                                  onChange={(e) => setHCode(i, e.target.value)}
+                                  placeholder={t("calc.l012_h_placeholder")}
+                                  className="h-11 text-base font-mono uppercase"
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })()}
                 </div>
               </TabsContent>
 
@@ -351,7 +358,7 @@ export default function Calculator() {
         </div>
 
         {result && (
-          <Card className={result.finalGroup === 1 ? "border-destructive border-2" : "border-success border-2"}>
+          <Card ref={resultRef} className={result.finalGroup === 1 ? "border-destructive border-2 scroll-mt-4" : "border-success border-2 scroll-mt-4"}>
             <CardHeader>
               <CardTitle className="flex items-center gap-3 text-xl">
                 {result.finalGroup === 1 ? <AlertTriangle className="h-7 w-7 text-destructive" /> : <CheckCircle2 className="h-7 w-7 text-success" />}
