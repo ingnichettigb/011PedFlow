@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { AppLayout } from "@/components/AppLayout";
@@ -65,6 +65,17 @@ export default function Calculator() {
   const [clpHint, setClpHint] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"sds" | "clp">("sds");
   const [hDetails, setHDetails] = useState<HCodeDetail[]>([]);
+  const [orgId, setOrgId] = useState<string | null>(null);
+  const resultRef = useRef<HTMLDivElement | null>(null);
+
+  // Load org_id from profile
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      const { data } = await supabase.from("profiles").select("org_id").eq("user_id", user.id).maybeSingle();
+      setOrgId(data?.org_id ?? null);
+    })();
+  }, [user]);
 
   // Load existing or duplicate
   useEffect(() => {
@@ -94,6 +105,11 @@ export default function Calculator() {
   const setHCode = (i: number, v: string) => {
     const next = [...form.hCodes];
     next[i] = v;
+    // If a row becomes incomplete, clear the dependent rows below
+    const firstFour = next.slice(0, 4).every((x) => x.trim() !== "");
+    const firstEight = firstFour && next.slice(4, 8).every((x) => x.trim() !== "");
+    if (!firstFour) for (let k = 4; k < 12; k++) next[k] = "";
+    else if (!firstEight) for (let k = 8; k < 12; k++) next[k] = "";
     setForm({ ...form, hCodes: next });
   };
 
@@ -119,13 +135,19 @@ export default function Calculator() {
     if (!r) return;
     setResult(r);
     const codes = form.hCodes.map((c) => c.trim().toUpperCase()).filter(Boolean);
-    if (codes.length === 0) { setHDetails([]); return; }
-    const { data } = await supabase
-      .from("h_codes_db")
-      .select("codice, classe_pericolo, descrizione, categoria_clp, avvertenza, voce_ped")
-      .in("codice", codes);
-    const map = new Map((data ?? []).map((d: any) => [d.codice, d]));
-    setHDetails(codes.map((c) => map.get(c) ?? { codice: c, classe_pericolo: null, descrizione: null, categoria_clp: null, avvertenza: null, voce_ped: null }));
+    if (codes.length === 0) {
+      setHDetails([]);
+    } else {
+      const { data } = await supabase
+        .from("h_codes_db")
+        .select("codice, classe_pericolo, descrizione, categoria_clp, avvertenza, voce_ped")
+        .in("codice", codes);
+      const map = new Map((data ?? []).map((d: any) => [d.codice, d]));
+      setHDetails(codes.map((c) => map.get(c) ?? { codice: c, classe_pericolo: null, descrizione: null, categoria_clp: null, avvertenza: null, voce_ped: null }));
+    }
+    requestAnimationFrame(() => {
+      resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
   };
 
   const handleReset = () => { setForm(emptyForm()); setResult(null); setHDetails([]); setLoadId(null); navigate("/calcolatore"); };
@@ -175,8 +197,21 @@ export default function Calculator() {
       setHDetails(details);
     }
 
+    let effectiveOrgId = orgId;
+    if (!effectiveOrgId && user) {
+      const { data: prof } = await supabase.from("profiles").select("org_id").eq("user_id", user.id).maybeSingle();
+      effectiveOrgId = prof?.org_id ?? null;
+      if (effectiveOrgId) setOrgId(effectiveOrgId);
+    }
+    if (!effectiveOrgId) {
+      toast.error("Organizzazione non trovata per l'utente. Impossibile salvare.");
+      setSaving(false);
+      return;
+    }
+
     const payload = {
       user_id: user!.id,
+      org_id: effectiveOrgId,
       commessa: form.commessa || null,
       cliente: form.cliente || null,
       progetto: form.progetto || null,
@@ -277,26 +312,33 @@ export default function Calculator() {
                 </div>
                 <div>
                   <h3 className="text-base font-semibold mb-3">{t("calc.l011_h")}</h3>
-                  <div className="grid gap-3 grid-cols-2 md:grid-cols-4">
-                    {form.hCodes.map((c, i) => {
-                      const firstFour = form.hCodes.slice(0, 4).every((x) => x.trim() !== "");
-                      const firstEight = form.hCodes.slice(0, 8).every((x) => x.trim() !== "");
-                      const disabled = (i >= 4 && i < 8 && !firstFour) || (i >= 8 && !firstEight);
-                      return (
-                        <div key={i}>
-                          <Label htmlFor={`h-${i}`} className="text-sm font-semibold">{`H${String(i + 1).padStart(2, "0")}`}</Label>
-                          <Input
-                            id={`h-${i}`}
-                            value={c}
-                            onChange={(e) => setHCode(i, e.target.value)}
-                            placeholder={t("calc.l012_h_placeholder")}
-                            disabled={disabled}
-                            className="h-11 text-base font-mono uppercase disabled:opacity-50 disabled:cursor-not-allowed"
-                          />
-                        </div>
-                      );
-                    })}
-                  </div>
+                  {(() => {
+                    const firstFour = form.hCodes.slice(0, 4).every((x) => x.trim() !== "");
+                    const firstEight = firstFour && form.hCodes.slice(4, 8).every((x) => x.trim() !== "");
+                    const rows: number[][] = [[0, 1, 2, 3]];
+                    if (firstFour) rows.push([4, 5, 6, 7]);
+                    if (firstEight) rows.push([8, 9, 10, 11]);
+                    return (
+                      <div className="space-y-3">
+                        {rows.map((row, rIdx) => (
+                          <div key={rIdx} className="grid gap-3 grid-cols-2 md:grid-cols-4">
+                            {row.map((i) => (
+                              <div key={i}>
+                                <Label htmlFor={`h-${i}`} className="text-sm font-semibold">{`H${String(i + 1).padStart(2, "0")}`}</Label>
+                                <Input
+                                  id={`h-${i}`}
+                                  value={form.hCodes[i]}
+                                  onChange={(e) => setHCode(i, e.target.value)}
+                                  placeholder={t("calc.l012_h_placeholder")}
+                                  className="h-11 text-base font-mono uppercase"
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })()}
                 </div>
               </TabsContent>
 
@@ -321,7 +363,7 @@ export default function Calculator() {
         </div>
 
         {result && (
-          <Card className={result.finalGroup === 1 ? "border-destructive border-2" : "border-success border-2"}>
+          <Card ref={resultRef} className={result.finalGroup === 1 ? "border-destructive border-2 scroll-mt-4" : "border-success border-2 scroll-mt-4"}>
             <CardHeader>
               <CardTitle className="flex items-center gap-3 text-xl">
                 {result.finalGroup === 1 ? <AlertTriangle className="h-7 w-7 text-destructive" /> : <CheckCircle2 className="h-7 w-7 text-success" />}
