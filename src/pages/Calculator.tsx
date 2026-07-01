@@ -27,6 +27,7 @@ type HCodeDetail = {
   categoria_clp: string | null;
   avvertenza: string | null;
   voce_ped: string | null;
+  gruppo_ped: string | null;
 };
 
 type FormState = {
@@ -140,10 +141,10 @@ export default function Calculator() {
     } else {
       const { data } = await supabase
         .from("h_codes_db")
-        .select("codice, classe_pericolo, descrizione, categoria_clp, avvertenza, voce_ped")
+        .select("codice, classe_pericolo, descrizione, categoria_clp, avvertenza, voce_ped, gruppo_ped")
         .in("codice", codes);
       const map = new Map((data ?? []).map((d: any) => [d.codice, d]));
-      setHDetails(codes.map((c) => map.get(c) ?? { codice: c, classe_pericolo: null, descrizione: null, categoria_clp: null, avvertenza: null, voce_ped: null }));
+      setHDetails(codes.map((c) => map.get(c) ?? { codice: c, classe_pericolo: null, descrizione: null, categoria_clp: null, avvertenza: null, voce_ped: null, gruppo_ped: null }));
     }
     requestAnimationFrame(() => {
       resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -190,10 +191,10 @@ export default function Calculator() {
     if (cleanCodes.length > 0 && details.length === 0) {
       const { data: dd } = await supabase
         .from("h_codes_db")
-        .select("codice, classe_pericolo, descrizione, categoria_clp, avvertenza, voce_ped")
+        .select("codice, classe_pericolo, descrizione, categoria_clp, avvertenza, voce_ped, gruppo_ped")
         .in("codice", cleanCodes);
       const map = new Map((dd ?? []).map((d: any) => [d.codice, d]));
-      details = cleanCodes.map((c) => map.get(c) ?? { codice: c, classe_pericolo: null, descrizione: null, categoria_clp: null, avvertenza: null, voce_ped: null });
+      details = cleanCodes.map((c) => map.get(c) ?? { codice: c, classe_pericolo: null, descrizione: null, categoria_clp: null, avvertenza: null, voce_ped: null, gruppo_ped: null });
       setHDetails(details);
     }
 
@@ -402,7 +403,14 @@ export default function Calculator() {
               {result.determiningCodes.length > 0 && (
                 <div>
                   <span className="text-sm font-semibold">{t("calc.determining_codes")}: </span>
-                  {result.determiningCodes.map((c) => <Badge key={c} variant="secondary" className="mr-1 font-mono">{c}</Badge>)}
+                  {result.determiningCodes.map((c) => {
+                    const g = hDetails.find((d) => d.codice === c)?.gruppo_ped ?? "";
+                    let cls = "mr-1 font-mono ";
+                    if (g === "Gruppo 1") cls += "bg-destructive text-yellow-300 hover:bg-destructive";
+                    else if (g === "Gruppo 1*") cls += "bg-orange-500 text-yellow-100 hover:bg-orange-500";
+                    else cls += "bg-secondary text-secondary-foreground";
+                    return <Badge key={c} className={cls}>{c}</Badge>;
+                  })}
                 </div>
               )}
               <Alert>
