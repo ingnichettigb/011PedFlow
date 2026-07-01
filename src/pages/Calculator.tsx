@@ -306,8 +306,29 @@ export default function Calculator() {
                   <Field id="f-cas" label={t("calc.l006_cas")} value={form.casNo} onChange={(v) => setForm({ ...form, casNo: v })} />
                   <Field id="f-ec" label={t("calc.l007_ec")} value={form.ecNo} onChange={(v) => setForm({ ...form, ecNo: v })} />
                   <div>
-                    <Field id="f-fp" label={t("calc.l010_fp")} value={form.flashPoint} onChange={(v) => setForm({ ...form, flashPoint: v })} type="number" />
-                    <p className="text-xs text-muted-foreground mt-1">{t("calc.fp_optional")}</p>
+                    {(() => {
+                      const fpN = numOrNull(form.flashPoint);
+                      const tminN = numOrNull(form.tMin);
+                      const tmaxN = numOrNull(form.tMax);
+                      const inRange = fpN != null && tminN != null && tmaxN != null && fpN >= tminN && fpN <= tmaxN;
+                      return (
+                        <>
+                          <Label htmlFor="f-fp" className="text-sm font-semibold">{t("calc.l010_fp")}</Label>
+                          <Input
+                            id="f-fp"
+                            type="number"
+                            value={form.flashPoint}
+                            onChange={(e) => setForm({ ...form, flashPoint: e.target.value })}
+                            className={`h-11 text-base mt-1 ${inRange ? "bg-yellow-300 text-red-600 font-bold" : ""}`}
+                          />
+                          {inRange ? (
+                            <p className="text-sm mt-1 font-bold text-red-600">Flash point in fase di lavoro</p>
+                          ) : (
+                            <p className="text-xs text-muted-foreground mt-1">{t("calc.fp_optional")}</p>
+                          )}
+                        </>
+                      );
+                    })()}
                   </div>
                 </div>
                 <div>
