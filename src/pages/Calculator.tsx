@@ -114,7 +114,7 @@ export default function Calculator() {
     setForm({ ...form, hCodes: next });
   };
 
-  const buildAndValidate = (): ClassificationResult | null => {
+  const buildAndValidate = (dangerousCodes?: Set<string>): ClassificationResult | null => {
     if (!form.fluidName.trim()) { toast.error(t("calc.fluid_required")); return null; }
     const cleanCodes: string[] = [];
     for (const c of form.hCodes) {
@@ -128,24 +128,26 @@ export default function Calculator() {
     const tmin = numOrNull(form.tMin);
     const tmax = numOrNull(form.tMax);
     if (tmin != null && tmax != null && tmin > tmax) { toast.error(t("calc.invalid_temps")); return null; }
-    return classify({ hCodes: cleanCodes, flashPoint: fp, tMin: tmin, tMax: tmax });
+    return classify({ hCodes: cleanCodes, flashPoint: fp, tMin: tmin, tMax: tmax, dangerousCodes });
   };
 
   const handleCalculate = async () => {
-    const r = buildAndValidate();
-    if (!r) return;
-    setResult(r);
     const codes = form.hCodes.map((c) => c.trim().toUpperCase()).filter(Boolean);
-    if (codes.length === 0) {
-      setHDetails([]);
-    } else {
+    let details: HCodeDetail[] = [];
+    let dangerSet: Set<string> | undefined;
+    if (codes.length > 0) {
       const { data } = await supabase
         .from("h_codes_db")
         .select("codice, classe_pericolo, descrizione, categoria_clp, avvertenza, voce_ped, gruppo_ped")
         .in("codice", codes);
       const map = new Map((data ?? []).map((d: any) => [d.codice, d]));
-      setHDetails(codes.map((c) => map.get(c) ?? { codice: c, classe_pericolo: null, descrizione: null, categoria_clp: null, avvertenza: null, voce_ped: null, gruppo_ped: null }));
+      details = codes.map((c) => map.get(c) ?? { codice: c, classe_pericolo: null, descrizione: null, categoria_clp: null, avvertenza: null, voce_ped: null, gruppo_ped: null });
+      dangerSet = new Set(details.filter((d) => (d.gruppo_ped ?? "").startsWith("Gruppo 1")).map((d) => d.codice));
     }
+    const r = buildAndValidate(dangerSet);
+    if (!r) return;
+    setResult(r);
+    setHDetails(details);
     requestAnimationFrame(() => {
       resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
@@ -351,7 +353,6 @@ export default function Calculator() {
                                   id={`h-${i}`}
                                   value={form.hCodes[i]}
                                   onChange={(e) => setHCode(i, e.target.value)}
-                                  placeholder={t("calc.l012_h_placeholder")}
                                   className="h-11 text-base font-mono uppercase"
                                 />
                               </div>

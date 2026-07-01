@@ -27,6 +27,8 @@ export interface ClassificationInput {
   flashPoint: number | null;  // °C, null if not declared
   tMin: number | null;
   tMax: number | null;
+  /** Optional override: set of H codes considered dangerous (Gruppo 1) per DB */
+  dangerousCodes?: Set<string>;
 }
 
 export interface ClassificationResult {
@@ -47,7 +49,8 @@ export interface ClassificationResult {
 
 export function classify(input: ClassificationInput): ClassificationResult {
   const codes = input.hCodes.map((c) => c.trim().toUpperCase()).filter(Boolean);
-  const dangerous = codes.filter((c) => DANGEROUS_SET.has(c));
+  const dangerSet = input.dangerousCodes ?? DANGEROUS_SET;
+  const dangerous = codes.filter((c) => dangerSet.has(c));
   const hasH226 = codes.includes("H226");
   const fp = input.flashPoint;
   const tmax = input.tMax;
