@@ -402,7 +402,14 @@ export default function Calculator() {
               {result.determiningCodes.length > 0 && (
                 <div>
                   <span className="text-sm font-semibold">{t("calc.determining_codes")}: </span>
-                  {result.determiningCodes.map((c) => <Badge key={c} variant="secondary" className="mr-1 font-mono">{c}</Badge>)}
+                  {result.determiningCodes.map((c) => {
+                    const g = hDetails.find((d) => d.codice === c)?.gruppo_ped ?? "";
+                    let cls = "mr-1 font-mono ";
+                    if (g === "Gruppo 1") cls += "bg-destructive text-yellow-300 hover:bg-destructive";
+                    else if (g === "Gruppo 1*") cls += "bg-orange-500 text-yellow-100 hover:bg-orange-500";
+                    else cls += "bg-secondary text-secondary-foreground";
+                    return <Badge key={c} className={cls}>{c}</Badge>;
+                  })}
                 </div>
               )}
               <Alert>
