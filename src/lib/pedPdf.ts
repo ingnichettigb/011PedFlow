@@ -56,7 +56,6 @@ export function generatePedPdf(data: PdfData, t: TFunction, lang: string): jsPDF
   doc.text(`${t("pdf.norm")} / ${t2("pdf.norm")}`, M, 25);
   y = 42;
 
-  y = 38;
   doc.setTextColor(15, 23, 42);
 
   const section = (title: string) => {
