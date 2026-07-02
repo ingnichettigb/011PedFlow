@@ -1,5 +1,6 @@
 import { jsPDF } from "jspdf";
 import type { TFunction } from "i18next";
+import i18n from "@/i18n";
 
 export interface PdfData {
   commessa?: string;
@@ -36,20 +37,25 @@ export function generatePedPdf(data: PdfData, t: TFunction, lang: string): jsPDF
 
   doc.setFont("helvetica", "normal"); // Helvetica = Arial equivalent in jsPDF
 
-  // Header
-  doc.setFillColor(15, 23, 42);
-  doc.rect(0, 0, W, 28, "F");
+  // Secondary language: English by default, Italian if primary is English
+  const primary = (lang || "it").slice(0, 2);
+  const secondaryLng = primary === "en" ? "it" : "en";
+  const t2 = i18n.getFixedT(secondaryLng);
+
+  // Header — electric blue
+  doc.setFillColor(0, 102, 255);
+  doc.rect(0, 0, W, 32, "F");
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(18);
   doc.setFont("helvetica", "bold");
   doc.text("PedFlow", M, 12);
   doc.setFontSize(11);
   doc.setFont("helvetica", "normal");
-  doc.text(t("pdf.title"), M, 19);
+  doc.text(`${t("pdf.title")} / ${t2("pdf.title")}`, M, 19);
   doc.setFontSize(9);
-  doc.text(t("pdf.norm"), M, 24.5);
+  doc.text(`${t("pdf.norm")} / ${t2("pdf.norm")}`, M, 25);
+  y = 42;
 
-  y = 38;
   doc.setTextColor(15, 23, 42);
 
   const section = (title: string) => {
