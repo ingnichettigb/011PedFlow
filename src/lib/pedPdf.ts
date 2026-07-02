@@ -58,26 +58,40 @@ export function generatePedPdf(data: PdfData, t: TFunction, lang: string): jsPDF
 
   doc.setTextColor(15, 23, 42);
 
-  const section = (title: string) => {
-    if (y > 265) { doc.addPage(); y = M; }
+  const bi = (key: string) => {
+    const a = t(key);
+    const b = t2(key);
+    return a === b ? a : `${a} / ${b}`;
+  };
+
+  const section = (key: string) => {
+    if (y > 260) { doc.addPage(); y = M; }
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(11);
+    doc.setFontSize(10.5);
     doc.setFillColor(241, 245, 249);
-    doc.rect(M, y - 4, W - 2 * M, 7, "F");
-    doc.text(title, M + 2, y + 1);
-    y += 8;
+    const text = bi(key);
+    const lines = doc.splitTextToSize(text, W - 2 * M - 4);
+    const h = lines.length * 5 + 3;
+    doc.rect(M, y - 4, W - 2 * M, h, "F");
+    doc.text(lines, M + 2, y + 1);
+    y += h + 2;
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
   };
 
-  const row = (label: string, value: string) => {
-    if (y > 275) { doc.addPage(); y = M; }
+  const row = (labelKey: string, value: string) => {
+    if (y > 270) { doc.addPage(); y = M; }
+    const labelW = W - 2 * M - 4;
     doc.setFont("helvetica", "bold");
-    doc.text(label + ":", M + 2, y);
+    doc.setFontSize(9.5);
+    const labelLines = doc.splitTextToSize(bi(labelKey) + ":", labelW);
+    doc.text(labelLines, M + 2, y);
+    y += labelLines.length * 4.5;
     doc.setFont("helvetica", "normal");
-    const lines = doc.splitTextToSize(value || "—", W - 2 * M - 60);
-    doc.text(lines, M + 62, y);
-    y += Math.max(6, lines.length * 5);
+    doc.setFontSize(10);
+    const valLines = doc.splitTextToSize(value || "—", labelW);
+    doc.text(valLines, M + 6, y + 0.5);
+    y += valLines.length * 5 + 2.5;
   };
 
   // Section: Document
