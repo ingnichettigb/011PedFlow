@@ -95,36 +95,40 @@ export function generatePedPdf(data: PdfData, t: TFunction, lang: string): jsPDF
   };
 
   // Section: Document
-  section(t("pdf.doc_data"));
-  row(t("calc.l001_commessa"), data.commessa || "—");
-  row(t("calc.l002_cliente"), data.cliente || "—");
-  row(t("calc.l003_progetto"), data.progetto || "—");
-  row(t("calc.l004_disegno"), data.numeroDisegno || "—");
+  section("pdf.doc_data");
+  row("calc.l001_commessa", data.commessa || "—");
+  row("calc.l002_cliente", data.cliente || "—");
+  row("calc.l003_progetto", data.progetto || "—");
+  row("calc.l004_disegno", data.numeroDisegno || "—");
 
   // Section: Fluid
   y += 2;
-  section(t("pdf.fluid_data"));
-  row(t("calc.l005_fluid_name"), data.fluidName);
-  row(t("calc.l006_cas"), data.casNo || "—");
-  row(t("calc.l007_ec"), data.ecNo || "—");
+  section("pdf.fluid_data");
+  row("calc.l005_fluid_name", data.fluidName);
+  row("calc.l006_cas", data.casNo || "—");
+  row("calc.l007_ec", data.ecNo || "—");
 
   // Section: Operating conditions
   y += 2;
-  section(t("pdf.op_conditions"));
-  row(t("calc.l008_tmin"), data.tMin != null ? `${data.tMin} °C` : "—");
-  row(t("calc.l009_tmax"), data.tMax != null ? `${data.tMax} °C` : "—");
-  row(t("calc.l010_fp"), data.flashPoint != null ? `${data.flashPoint} °C` : "—");
+  section("pdf.op_conditions");
+  row("calc.l008_tmin", data.tMin != null ? `${data.tMin} °C` : "—");
+  row("calc.l009_tmax", data.tMax != null ? `${data.tMax} °C` : "—");
+  row("calc.l010_fp", data.flashPoint != null ? `${data.flashPoint} °C` : "—");
 
   // Section: H codes
   y += 2;
-  section(t("pdf.h_codes"));
+  section("pdf.h_codes");
   doc.text(data.hCodes.length ? data.hCodes.join(", ") : "—", M + 2, y);
   y += 7;
   if (data.determiningCodes.length > 0) {
     doc.setFont("helvetica", "bold");
-    doc.text(t("pdf.determining") + ":", M + 2, y);
+    doc.setFontSize(9.5);
+    const lbl = doc.splitTextToSize(bi("pdf.determining") + ":", W - 2 * M - 4);
+    doc.text(lbl, M + 2, y);
+    y += lbl.length * 4.5;
     doc.setFont("helvetica", "normal");
-    doc.text(data.determiningCodes.join(", "), M + 62, y);
+    doc.setFontSize(10);
+    doc.text(data.determiningCodes.join(", "), M + 6, y);
     y += 7;
   }
 
@@ -135,18 +139,22 @@ export function generatePedPdf(data: PdfData, t: TFunction, lang: string): jsPDF
     doc.setFont("helvetica", "bold");
     doc.setFontSize(9);
     const cols = [
-      { label: t("db.col_code"), w: 18 },
-      { label: t("db.col_hazard_class"), w: 32 },
-      { label: t("db.col_description"), w: 60 },
-      { label: t("db.col_clp_category"), w: 26 },
-      { label: t("db.col_signal_word"), w: 22 },
-      { label: t("db.col_ped_entry"), w: 16 },
+      { label: bi("db.col_code"), w: 18 },
+      { label: bi("db.col_hazard_class"), w: 32 },
+      { label: bi("db.col_description"), w: 60 },
+      { label: bi("db.col_clp_category"), w: 26 },
+      { label: bi("db.col_signal_word"), w: 22 },
+      { label: bi("db.col_ped_entry"), w: 16 },
     ];
     doc.setFillColor(241, 245, 249);
-    doc.rect(M, y - 4, W - 2 * M, 6, "F");
+    doc.rect(M, y - 4, W - 2 * M, 10, "F");
     let x = M + 1;
-    cols.forEach((c) => { doc.text(c.label, x, y); x += c.w; });
-    y += 4;
+    cols.forEach((c) => {
+      const w = doc.splitTextToSize(c.label, c.w - 2);
+      doc.text(w, x, y);
+      x += c.w;
+    });
+    y += 8;
     doc.setFont("helvetica", "normal");
     data.hDetails.forEach((d) => {
       const vals = [d.codice, d.classe_pericolo ?? "—", d.descrizione ?? "—", d.categoria_clp ?? "—", d.avvertenza ?? "—", d.voce_ped ?? "—"];
@@ -162,19 +170,21 @@ export function generatePedPdf(data: PdfData, t: TFunction, lang: string): jsPDF
 
   // Section: Result
   y += 2;
-  section(t("pdf.result"));
-  row(t("pdf.base_group"), `${t("pdf.base_group")} ${data.baseGroup}`);
+  section("pdf.result");
+  row("pdf.base_group", `${data.baseGroup}`);
   // Final group highlighted
   if (y > 260) { doc.addPage(); y = M; }
   const isG1 = data.finalGroup === 1;
   doc.setFillColor(isG1 ? 220 : 220, isG1 ? 38 : 252, isG1 ? 38 : 231);
   if (isG1) doc.setFillColor(220, 38, 38); else doc.setFillColor(34, 197, 94);
-  doc.rect(M, y, W - 2 * M, 14, "F");
+  doc.rect(M, y, W - 2 * M, 16, "F");
   doc.setTextColor(255, 255, 255);
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(14);
-  doc.text(`${t("pdf.final_group")}: ${isG1 ? t("calc.group1") : t("calc.group2")}`, M + 4, y + 9);
-  y += 18;
+  doc.setFontSize(12);
+  const grpTxt = `${bi("pdf.final_group")}: ${isG1 ? bi("calc.group1") : bi("calc.group2")}`;
+  const grpLines = doc.splitTextToSize(grpTxt, W - 2 * M - 8);
+  doc.text(grpLines, M + 4, y + 6);
+  y += Math.max(16, grpLines.length * 5 + 6) + 4;
   doc.setTextColor(15, 23, 42);
   doc.setFontSize(10);
   doc.setFont("helvetica", "normal");
@@ -182,9 +192,12 @@ export function generatePedPdf(data: PdfData, t: TFunction, lang: string): jsPDF
   // Rationale
   if (y > 250) { doc.addPage(); y = M; }
   doc.setFont("helvetica", "bold");
-  doc.text(t("pdf.rationale") + ":", M + 2, y);
-  y += 6;
+  doc.setFontSize(9.5);
+  const ratL = doc.splitTextToSize(bi("pdf.rationale") + ":", W - 2 * M - 4);
+  doc.text(ratL, M + 2, y);
+  y += ratL.length * 4.5 + 1;
   doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
   const rl = doc.splitTextToSize(data.rationale, W - 2 * M - 4);
   doc.text(rl, M + 2, y);
   y += rl.length * 5 + 4;
@@ -192,11 +205,12 @@ export function generatePedPdf(data: PdfData, t: TFunction, lang: string): jsPDF
   if (data.art13Applied) {
     if (y > 270) { doc.addPage(); y = M; }
     doc.setFillColor(254, 243, 199);
-    doc.rect(M, y, W - 2 * M, 10, "F");
+    doc.rect(M, y, W - 2 * M, 12, "F");
     doc.setFont("helvetica", "bold");
     doc.setTextColor(120, 53, 15);
-    doc.text("⚠ " + t("pdf.art13") + " — Art. 13 Dir. 2014/68/EU", M + 3, y + 6.5);
-    y += 14;
+    const artL = doc.splitTextToSize("⚠ " + bi("pdf.art13") + " — Art. 13 Dir. 2014/68/EU", W - 2 * M - 6);
+    doc.text(artL, M + 3, y + 5);
+    y += Math.max(12, artL.length * 5) + 4;
     doc.setTextColor(15, 23, 42);
   }
 
@@ -206,10 +220,10 @@ export function generatePedPdf(data: PdfData, t: TFunction, lang: string): jsPDF
     doc.setPage(p);
     doc.setFontSize(8);
     doc.setTextColor(100, 116, 139);
-    const dis = doc.splitTextToSize(t("pdf.disclaimer"), W - 2 * M);
+    const dis = doc.splitTextToSize(bi("pdf.disclaimer"), W - 2 * M);
     doc.text(dis, M, 285);
     doc.text(
-      `${t("pdf.page")} ${p} ${t("pdf.of")} ${totalPages} • ${t("pdf.generated_on")} ${new Date().toLocaleString(lang)}`,
+      `${bi("pdf.page")} ${p} ${bi("pdf.of")} ${totalPages} • ${bi("pdf.generated_on")} ${new Date().toLocaleString(lang)}`,
       M,
       292
     );
