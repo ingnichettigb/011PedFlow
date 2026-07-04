@@ -100,7 +100,7 @@ export function generatePedPdf(data: PdfData, t: TFunction, lang: string): jsPDF
     zebra = 0;
   };
 
-  const drawRow = (labelKey: string, value: string) => {
+  const drawRow = (labelKey: string, value: string, valueOptions?: { color?: [number, number, number]; bold?: boolean }) => {
     const it = t(labelKey);
     const en = t2(labelKey);
     const bilingual = it !== en;
@@ -135,8 +135,9 @@ export function generatePedPdf(data: PdfData, t: TFunction, lang: string): jsPDF
       doc.text(enLines, M + 3, y + 4.5 + itLines.length * 4);
     }
 
-    doc.setTextColor(15, 23, 42);
-    doc.setFont("helvetica", "normal");
+    if (valueOptions?.color) doc.setTextColor(...valueOptions.color);
+    else doc.setTextColor(15, 23, 42);
+    doc.setFont("helvetica", valueOptions?.bold ? "bold" : "normal");
     doc.setFontSize(10.5);
     const valStartY = y + (rowH - valueH) / 2 + 3.8;
     doc.text(valLines, VALUE_X, valStartY);
