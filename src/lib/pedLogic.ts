@@ -61,7 +61,7 @@ export function classify(input: ClassificationInput): ClassificationResult {
       baseGroup: 1,
       finalGroup: 1,
       art13Applied: false,
-      determiningCodes: dangerous,
+      determiningCodes: Array.from(new Set(dangerous)),
       reasonKey: "h_dangerous",
       reasonParams: { codes: dangerous.join(", ") },
     };
