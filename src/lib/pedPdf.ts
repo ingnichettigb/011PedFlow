@@ -162,7 +162,8 @@ export function generatePedPdf(data: PdfData, t: TFunction, lang: string): jsPDF
   drawSectionTitle("pdf.op_conditions");
   drawRow("calc.l008_tmin", data.tMin != null ? `${data.tMin} °C` : "");
   drawRow("calc.l009_tmax", data.tMax != null ? `${data.tMax} °C` : "");
-  drawRow("calc.l010_fp", data.flashPoint != null ? `${data.flashPoint} °C` : "");
+  const fpAlert = data.flashPoint != null && data.tMax != null && data.flashPoint < data.tMax;
+  drawRow("calc.l010_fp", data.flashPoint != null ? `${data.flashPoint} °C` : "", fpAlert ? { color: [220, 38, 38], bold: true } : undefined);
 
   // H codes
   y += 3;
