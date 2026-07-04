@@ -28,7 +28,7 @@ const es = {
     l003_progetto: "[003] Proyecto",
     l004_disegno: "[004] N.º plano",
     l005_fluid_name: "[005] Nombre sustancia / fluido",
-    l006_cas: "[006] Número CAS",
+    l006_cas: "[006] Número CAS (Sección 3 SDS - Composición/información sobre los componentes)",
     l007_ec: "[007] Número EC",
     l008_tmin: "[008] Temperatura mínima de diseño Tmin (°C)",
     l009_tmax: "[009] Temperatura máxima de diseño Tmax / TS (°C)",

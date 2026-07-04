@@ -28,7 +28,7 @@ const en = {
     l003_progetto: "[003] Project",
     l004_disegno: "[004] Drawing no.",
     l005_fluid_name: "[005] Substance / fluid name",
-    l006_cas: "[006] CAS number",
+    l006_cas: "[006] CAS number (SDS Section 3 - Composition/information on ingredients)",
     l007_ec: "[007] EC number",
     l008_tmin: "[008] Minimum design temperature Tmin (°C)",
     l009_tmax: "[009] Maximum design temperature Tmax / TS (°C)",

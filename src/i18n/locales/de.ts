@@ -28,7 +28,7 @@ const de = {
     l003_progetto: "[003] Projekt",
     l004_disegno: "[004] Zeichnungsnr.",
     l005_fluid_name: "[005] Stoff- / Fluidname",
-    l006_cas: "[006] CAS-Nummer",
+    l006_cas: "[006] CAS-Nummer (Abschnitt 3 SDB - Zusammensetzung/Angaben zu Bestandteilen)",
     l007_ec: "[007] EG-Nummer",
     l008_tmin: "[008] Minimale Auslegungstemperatur Tmin (°C)",
     l009_tmax: "[009] Maximale Auslegungstemperatur Tmax / TS (°C)",
