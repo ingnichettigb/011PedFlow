@@ -178,27 +178,32 @@ export default function Calculator() {
     t(`reasons.${r.reasonKey}`, r.reasonParams);
 
   const handleSavePdf = async () => {
-    const r = result ?? buildAndValidate();
-    if (!r) return;
-    if (!result) setResult(r);
     setSaving(true);
     const cleanCodes = form.hCodes.map((c) => c.trim().toUpperCase()).filter(Boolean);
-    const fp = numOrNull(form.flashPoint);
-    const tmin = numOrNull(form.tMin);
-    const tmax = numOrNull(form.tMax);
-    const rationale = buildRationale(r);
 
-    // Always fetch fresh H code details so the saved PDF includes the technical table
-    let details = hDetails;
-    if (cleanCodes.length > 0 && details.length === 0) {
+    // Always fetch fresh H code details from DB so classification and PDF
+    // reflect the authoritative gruppo_ped, regardless of whether the user
+    // clicked "Calcola" before saving.
+    let details: HCodeDetail[] = hDetails;
+    let dangerSet: Set<string> | undefined;
+    if (cleanCodes.length > 0) {
       const { data: dd } = await supabase
         .from("h_codes_db")
         .select("codice, classe_pericolo, descrizione, categoria_clp, avvertenza, voce_ped, gruppo_ped")
         .in("codice", cleanCodes);
       const map = new Map((dd ?? []).map((d: any) => [d.codice, d]));
       details = cleanCodes.map((c) => map.get(c) ?? { codice: c, classe_pericolo: null, descrizione: null, categoria_clp: null, avvertenza: null, voce_ped: null, gruppo_ped: null });
+      dangerSet = new Set(details.filter((d) => (d.gruppo_ped ?? "").startsWith("Gruppo 1")).map((d) => d.codice));
       setHDetails(details);
     }
+
+    const r = buildAndValidate(dangerSet);
+    if (!r) { setSaving(false); return; }
+    setResult(r);
+    const fp = numOrNull(form.flashPoint);
+    const tmin = numOrNull(form.tMin);
+    const tmax = numOrNull(form.tMax);
+    const rationale = buildRationale(r);
 
     let effectiveOrgId = orgId;
     if (!effectiveOrgId && user) {
