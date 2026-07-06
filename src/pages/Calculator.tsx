@@ -117,10 +117,13 @@ export default function Calculator() {
   const buildAndValidate = (dangerousCodes?: Set<string>): ClassificationResult | null => {
     if (!form.fluidName.trim()) { toast.error(t("calc.fluid_required")); return null; }
     const cleanCodes: string[] = [];
+    const seen = new Set<string>();
     for (const c of form.hCodes) {
       const v = c.trim().toUpperCase();
       if (!v) continue;
       if (!validateHCode(v)) { toast.error(t("calc.invalid_h", { code: v })); return null; }
+      if (seen.has(v)) continue;
+      seen.add(v);
       cleanCodes.push(v);
     }
     const fp = numOrNull(form.flashPoint);
@@ -132,7 +135,9 @@ export default function Calculator() {
   };
 
   const handleCalculate = async () => {
-    const codes = form.hCodes.map((c) => c.trim().toUpperCase()).filter(Boolean);
+    const codes = Array.from(
+      new Set(form.hCodes.map((c) => c.trim().toUpperCase()).filter(Boolean))
+    );
     let details: HCodeDetail[] = [];
     let dangerSet: Set<string> | undefined;
     if (codes.length > 0) {
@@ -179,7 +184,9 @@ export default function Calculator() {
 
   const handleSavePdf = async () => {
     setSaving(true);
-    const cleanCodes = form.hCodes.map((c) => c.trim().toUpperCase()).filter(Boolean);
+    const cleanCodes = Array.from(
+      new Set(form.hCodes.map((c) => c.trim().toUpperCase()).filter(Boolean))
+    );
 
     // Always fetch fresh H code details from DB so classification and PDF
     // reflect the authoritative gruppo_ped, regardless of whether the user
@@ -347,21 +354,35 @@ export default function Calculator() {
                     const rows: number[][] = [[0, 1, 2, 3]];
                     if (firstFour) rows.push([4, 5, 6, 7]);
                     if (firstEight) rows.push([8, 9, 10, 11]);
+                    const normalized = form.hCodes.map((c) => c.trim().toUpperCase());
+                    const firstIndexByCode = new Map<string, number>();
+                    normalized.forEach((v, idx) => {
+                      if (v && !firstIndexByCode.has(v)) firstIndexByCode.set(v, idx);
+                    });
                     return (
                       <div className="space-y-3">
                         {rows.map((row, rIdx) => (
                           <div key={rIdx} className="grid gap-3 grid-cols-2 md:grid-cols-4">
-                            {row.map((i) => (
+                            {row.map((i) => {
+                              const v = normalized[i];
+                              const isDup = !!v && firstIndexByCode.get(v) !== i;
+                              return (
                               <div key={i}>
                                 <Label htmlFor={`h-${i}`} className="text-sm font-semibold">{`H${String(i + 1).padStart(2, "0")}`}</Label>
                                 <Input
                                   id={`h-${i}`}
                                   value={form.hCodes[i]}
                                   onChange={(e) => setHCode(i, e.target.value)}
-                                  className="h-11 text-base font-mono uppercase"
+                                  className={`h-11 text-base font-mono uppercase ${isDup ? "border-warning focus-visible:ring-warning" : ""}`}
                                 />
+                                {isDup && (
+                                  <p className="text-xs text-warning-foreground bg-warning/20 border border-warning rounded px-2 py-1 mt-1">
+                                    {t("calc.duplicate_h", { code: v })}
+                                  </p>
+                                )}
                               </div>
-                            ))}
+                              );
+                            })}
                           </div>
                         ))}
                       </div>

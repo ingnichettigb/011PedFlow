@@ -48,6 +48,7 @@ const de = {
     group2: "Gruppe 2 (Ungefährliches Fluid)",
     saved: "Klassifizierung im Register gespeichert",
     invalid_h: "Ungültiger H-Code: {{code}} (Format: H + 3 Ziffern)",
+    duplicate_h: "Code {{code}} bereits eingegeben, wird nur einmal berücksichtigt",
     invalid_fp: "Ungültiger Flammpunkt",
     invalid_temps: "Tmin muss ≤ Tmax sein",
     fluid_required: "Fluidname erforderlich",
