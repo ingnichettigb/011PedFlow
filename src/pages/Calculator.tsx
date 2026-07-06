@@ -117,10 +117,13 @@ export default function Calculator() {
   const buildAndValidate = (dangerousCodes?: Set<string>): ClassificationResult | null => {
     if (!form.fluidName.trim()) { toast.error(t("calc.fluid_required")); return null; }
     const cleanCodes: string[] = [];
+    const seen = new Set<string>();
     for (const c of form.hCodes) {
       const v = c.trim().toUpperCase();
       if (!v) continue;
       if (!validateHCode(v)) { toast.error(t("calc.invalid_h", { code: v })); return null; }
+      if (seen.has(v)) continue;
+      seen.add(v);
       cleanCodes.push(v);
     }
     const fp = numOrNull(form.flashPoint);
@@ -132,7 +135,9 @@ export default function Calculator() {
   };
 
   const handleCalculate = async () => {
-    const codes = form.hCodes.map((c) => c.trim().toUpperCase()).filter(Boolean);
+    const codes = Array.from(
+      new Set(form.hCodes.map((c) => c.trim().toUpperCase()).filter(Boolean))
+    );
     let details: HCodeDetail[] = [];
     let dangerSet: Set<string> | undefined;
     if (codes.length > 0) {
@@ -179,7 +184,9 @@ export default function Calculator() {
 
   const handleSavePdf = async () => {
     setSaving(true);
-    const cleanCodes = form.hCodes.map((c) => c.trim().toUpperCase()).filter(Boolean);
+    const cleanCodes = Array.from(
+      new Set(form.hCodes.map((c) => c.trim().toUpperCase()).filter(Boolean))
+    );
 
     // Always fetch fresh H code details from DB so classification and PDF
     // reflect the authoritative gruppo_ped, regardless of whether the user
