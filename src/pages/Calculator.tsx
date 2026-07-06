@@ -354,21 +354,35 @@ export default function Calculator() {
                     const rows: number[][] = [[0, 1, 2, 3]];
                     if (firstFour) rows.push([4, 5, 6, 7]);
                     if (firstEight) rows.push([8, 9, 10, 11]);
+                    const normalized = form.hCodes.map((c) => c.trim().toUpperCase());
+                    const firstIndexByCode = new Map<string, number>();
+                    normalized.forEach((v, idx) => {
+                      if (v && !firstIndexByCode.has(v)) firstIndexByCode.set(v, idx);
+                    });
                     return (
                       <div className="space-y-3">
                         {rows.map((row, rIdx) => (
                           <div key={rIdx} className="grid gap-3 grid-cols-2 md:grid-cols-4">
-                            {row.map((i) => (
+                            {row.map((i) => {
+                              const v = normalized[i];
+                              const isDup = !!v && firstIndexByCode.get(v) !== i;
+                              return (
                               <div key={i}>
                                 <Label htmlFor={`h-${i}`} className="text-sm font-semibold">{`H${String(i + 1).padStart(2, "0")}`}</Label>
                                 <Input
                                   id={`h-${i}`}
                                   value={form.hCodes[i]}
                                   onChange={(e) => setHCode(i, e.target.value)}
-                                  className="h-11 text-base font-mono uppercase"
+                                  className={`h-11 text-base font-mono uppercase ${isDup ? "border-warning focus-visible:ring-warning" : ""}`}
                                 />
+                                {isDup && (
+                                  <p className="text-xs text-warning-foreground bg-warning/20 border border-warning rounded px-2 py-1 mt-1">
+                                    {t("calc.duplicate_h", { code: v })}
+                                  </p>
+                                )}
                               </div>
-                            ))}
+                              );
+                            })}
                           </div>
                         ))}
                       </div>
