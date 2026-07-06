@@ -35,6 +35,13 @@ const groupVariant = (g: string) => {
   return "bg-warning/20 text-warning-foreground border border-warning";
 };
 
+const groupCodeStyle = (g: string) => {
+  if (g.includes("*")) return "bg-orange-500 text-white";
+  if (g.startsWith("Gruppo 1")) return "bg-destructive text-destructive-foreground";
+  if (g.startsWith("Gruppo 2")) return "bg-success text-success-foreground";
+  return "";
+};
+
 export default function Databases() {
   const { t } = useTranslation();
   const [rows, setRows] = useState<HCodeRow[]>([]);
@@ -186,7 +193,11 @@ export default function Databases() {
                 <TableBody>
                   {filtered.map((r) => (
                     <TableRow key={r.id}>
-                      <TableCell className="font-mono font-bold text-base">{r.codice}</TableCell>
+                      <TableCell className="font-mono font-bold text-base">
+                        <span className={`inline-block px-2 py-1 rounded ${groupCodeStyle(r.gruppo_ped)}`}>
+                          {r.codice}
+                        </span>
+                      </TableCell>
                       <TableCell><Badge className={groupVariant(r.gruppo_ped)}>{r.gruppo_ped}</Badge></TableCell>
                       <TableCell className="text-base">{r.classe_pericolo ?? r.categoria}</TableCell>
                       <TableCell className="text-base">{r.descrizione}</TableCell>
