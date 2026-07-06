@@ -48,6 +48,7 @@ const it = {
     group2: "Gruppo 2 (Fluido non pericoloso)",
     saved: "Classificazione salvata nel registro",
     invalid_h: "Codice H non valido: {{code}} (formato richiesto: H + 3 cifre)",
+    duplicate_h: "Codice {{code}} già inserito, verrà considerato una sola volta",
     invalid_fp: "Flash Point non valido",
     invalid_temps: "Tmin deve essere ≤ Tmax",
     fluid_required: "Nome fluido obbligatorio",
