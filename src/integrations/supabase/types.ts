@@ -137,6 +137,42 @@ export type Database = {
         }
         Relationships: []
       }
+      lead_emails: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          is_verified: boolean
+          otp_attempts: number
+          otp_window_start: string | null
+          source: string | null
+          verification_code: string | null
+          verified_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          is_verified?: boolean
+          otp_attempts?: number
+          otp_window_start?: string | null
+          source?: string | null
+          verification_code?: string | null
+          verified_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          is_verified?: boolean
+          otp_attempts?: number
+          otp_window_start?: string | null
+          source?: string | null
+          verification_code?: string | null
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
       organizations: {
         Row: {
           address: string | null

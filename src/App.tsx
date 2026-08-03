@@ -5,8 +5,11 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { LicenseGate } from "@/components/LicenseGate";
 
 import Landing from "./pages/Landing";
+import Auth from "./pages/Auth";
+import Activation from "./pages/Activation";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -26,15 +29,17 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <Routes>
-            <Route path="/" element={<Landing />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/calcolatore" element={<ProtectedRoute><Calculator /></ProtectedRoute>} />
-            <Route path="/classificazione/:id" element={<ProtectedRoute><Calculator /></ProtectedRoute>} />
-            <Route path="/registro" element={<ProtectedRoute><Registry /></ProtectedRoute>} />
-            <Route path="/databases" element={<ProtectedRoute><Databases /></ProtectedRoute>} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/attivazione" element={<Activation />} />
+            <Route path="/" element={<LicenseGate><Landing /></LicenseGate>} />
+            <Route path="/login" element={<LicenseGate><Login /></LicenseGate>} />
+            <Route path="/signup" element={<LicenseGate><Signup /></LicenseGate>} />
+            <Route path="/forgot-password" element={<LicenseGate><ForgotPassword /></LicenseGate>} />
+            <Route path="/reset-password" element={<LicenseGate><ResetPassword /></LicenseGate>} />
+            <Route path="/calcolatore" element={<LicenseGate><ProtectedRoute><Calculator /></ProtectedRoute></LicenseGate>} />
+            <Route path="/classificazione/:id" element={<LicenseGate><ProtectedRoute><Calculator /></ProtectedRoute></LicenseGate>} />
+            <Route path="/registro" element={<LicenseGate><ProtectedRoute><Registry /></ProtectedRoute></LicenseGate>} />
+            <Route path="/databases" element={<LicenseGate><ProtectedRoute><Databases /></ProtectedRoute></LicenseGate>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
