@@ -5,7 +5,7 @@ export type GatingError = { code: string; message: string };
 
 const FALLBACK: GatingError = {
   code: "E-500",
-  message: "Errore inatteso. Riprova più tardi.",
+  message: "Errore tecnico imprevisto. Riprova più tardi.",
 };
 
 async function call<T>(fn: string, body: unknown): Promise<{ data: T | null; error: GatingError | null }> {
@@ -19,7 +19,7 @@ async function call<T>(fn: string, body: unknown): Promise<{ data: T | null; err
         return { data: null, error: { code: parsed.code ?? "E-500", message: parsed.message } };
       }
     } catch {
-      /* non-JSON body */
+      /* corpo non JSON */
     }
   }
   console.error(`${fn} failed:`, error.message);
@@ -33,8 +33,19 @@ export const verifyOtp = (email: string, code: string) =>
   call<{ ok: true; email: string }>("verify-otp", { email, code });
 
 export const activateLicense = (email: string, licenseKey: string, puk: string) =>
-  call<{ ok: true; email: string; expiresAt: string | null }>("activate-license", {
-    email,
-    licenseKey,
-    puk,
-  });
+  call<{ ok: true; email: string; licenseId: string; expiresAt: string | null; reactivated: boolean }>(
+    "activate-license",
+    { email, licenseKey, puk },
+  );
+
+export const checkLicenseStatus = (licenseId: string) =>
+  call<{ valid: boolean; reason: "expired" | "deactivated" | "not_found" | null }>(
+    "check-license-status",
+    { licenseId },
+  );
+
+export const checkTermsConsent = (licenseId: string) =>
+  call<{ consented: boolean }>("terms-consent", { action: "check", licenseId });
+
+export const recordTermsConsent = (licenseId: string, language: string) =>
+  call<{ ok: true }>("terms-consent", { action: "record", licenseId, language });

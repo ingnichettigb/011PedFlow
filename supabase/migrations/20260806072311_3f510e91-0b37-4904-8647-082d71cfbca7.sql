@@ -1,0 +1,1 @@
+ALTER TABLE public.lead_emails ADD COLUMN IF NOT EXISTS code_sent_at timestamptz;

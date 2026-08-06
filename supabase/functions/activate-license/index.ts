@@ -1,5 +1,6 @@
-import { createClient } from "npm:@supabase/supabase-js@2";
-import { corsHeaders, fail, json, normalizeEmail, APP_CODE } from "../_shared/cors.ts";
+import {
+  corsHeaders, fail, json, normalizeEmail, internalClient, externalClient, APP_CODE,
+} from "../_shared/cors.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
@@ -13,104 +14,151 @@ Deno.serve(async (req) => {
     if (!licenseKey) return fail("E-400", "Codice licenza obbligatorio.", 400);
     if (!puk) return fail("E-400", "Codice PUK obbligatorio.", 400);
 
-    const supabaseAdmin = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-      { auth: { persistSession: false, autoRefreshToken: false } },
-    );
-
-    const { data: lead, error: leadErr } = await supabaseAdmin
+    // 1 — email verificata sul database interno
+    const internal = internalClient();
+    const { data: lead, error: leadErr } = await internal
       .from("lead_emails")
       .select("id, is_verified")
-      .eq("email", email)
+      .ilike("email", email)
+      .eq("is_verified", true)
+      .limit(1)
       .maybeSingle();
     if (leadErr) {
       console.error("select lead_emails failed:", leadErr.message);
-      return fail("E-500", "Errore interno. Riprova più tardi.", 500);
+      return fail("E-500", "Errore tecnico imprevisto. Riprova più tardi.", 500);
     }
-    if (!lead?.is_verified) {
-      return fail("E-001", "Email non verificata. Completa prima il passaggio 1.", 400);
-    }
+    if (!lead) return fail("E-001", "Email non verificata. Completa prima il passaggio 1.", 400);
 
-    const externalUrl = Deno.env.get("EXTERNAL_SUPABASE_URL");
-    const externalKey = Deno.env.get("EXTERNAL_SUPABASE_SERVICE_ROLE_KEY");
-    if (!externalUrl || !externalKey) {
+    const ext = externalClient();
+    if (!ext) {
       console.error("missing EXTERNAL_SUPABASE_URL / EXTERNAL_SUPABASE_SERVICE_ROLE_KEY");
       return fail("E-500", "Servizio licenze non configurato.", 500);
     }
-    const supabaseExternal = createClient(externalUrl, externalKey, {
-      auth: { persistSession: false, autoRefreshToken: false },
-    });
 
-    const { data: license, error: licErr } = await supabaseExternal
+    // 2 — licenza esistente, attiva, di questo prodotto (nessun filtro email)
+    const { data: license, error: licErr } = await ext
       .from("licenses")
-      .select("*")
+      .select("id, license_key, app_code, is_active, expires_at, activated_at")
       .eq("license_key", licenseKey)
       .eq("app_code", APP_CODE)
       .eq("is_active", true)
       .maybeSingle();
     if (licErr) {
       console.error("select licenses failed:", licErr.message);
-      return fail("E-500", "Errore interno nel controllo licenza.", 500);
+      return fail("E-500", "Errore tecnico imprevisto. Riprova più tardi.", 500);
     }
-    if (!license) return fail("E-101", "Codice licenza non trovato o non attivo.", 400);
+    if (!license) return fail("E-101", "Codice licenza inesistente, non attivo o di un altro prodotto.", 400);
 
-    const licenseEmail = String(license.user_email ?? "").trim().toLowerCase();
-    if (licenseEmail && licenseEmail !== email) {
-      return fail("E-102", "Questa licenza è associata a un'altra email.", 400);
-    }
+    // 3 — licenza non scaduta
     if (license.expires_at && new Date(license.expires_at).getTime() < Date.now()) {
       return fail("E-103", "Licenza scaduta. Contatta il supporto per rinnovarla.", 400);
     }
 
-    const { data: pukRow, error: pukErr } = await supabaseExternal
+    // 4 — PUK esistente
+    const { data: pukRow, error: pukErr } = await ext
       .from("puk_codes")
-      .select("*")
-      .eq("puk_code", puk)
+      .select("id, code, type_product_code, license_id, user_id, used")
+      .eq("code", puk)
       .maybeSingle();
     if (pukErr) {
       console.error("select puk_codes failed:", pukErr.message);
-      return fail("E-500", "Errore interno nel controllo PUK.", 500);
+      return fail("E-500", "Errore tecnico imprevisto. Riprova più tardi.", 500);
     }
-    if (!pukRow) return fail("E-201", "Codice PUK non trovato.", 400);
+    if (!pukRow) return fail("E-201", "Codice PUK inesistente.", 400);
 
-    const isReactivation = Boolean(license.activated_at);
-    if (pukRow.used && !isReactivation) {
-      return fail("E-202", "Codice PUK già utilizzato.", 400);
+    // 5 — PUK di questo prodotto
+    if (pukRow.type_product_code && pukRow.type_product_code !== APP_CODE) {
+      return fail("E-203", "Questo PUK appartiene a un altro prodotto.", 400);
     }
 
+    // 6 — PUK collegato alla licenza (mappa o legame diretto)
+    let linked = pukRow.license_id === license.id;
+    if (!linked) {
+      const { data: map, error: mapErr } = await ext
+        .from("license_puk_map")
+        .select("id")
+        .eq("license_id", license.id)
+        .eq("puk_id", pukRow.id)
+        .maybeSingle();
+      if (mapErr) {
+        console.error("select license_puk_map failed:", mapErr.message);
+        return fail("E-500", "Errore tecnico imprevisto. Riprova più tardi.", 500);
+      }
+      linked = Boolean(map);
+    }
+    if (!linked) return fail("E-204", "Il PUK non è associato alla licenza inserita.", 400);
+
+    // 7 — utente nell'anagrafica condivisa
+    let userId: string | null = null;
+    const { data: userRow, error: userSelErr } = await ext
+      .from("users")
+      .select("id")
+      .ilike("email", email)
+      .limit(1)
+      .maybeSingle();
+    if (userSelErr) {
+      console.error("select users failed:", userSelErr.message);
+      return fail("E-500", "Errore tecnico imprevisto. Riprova più tardi.", 500);
+    }
+    if (userRow) {
+      userId = userRow.id;
+    } else {
+      const { data: created, error: userInsErr } = await ext
+        .from("users")
+        .insert({ email })
+        .select("id")
+        .maybeSingle();
+      if (userInsErr || !created) {
+        console.error("insert users failed:", userInsErr?.message);
+        return fail("E-500", "Errore tecnico imprevisto. Riprova più tardi.", 500);
+      }
+      userId = created.id;
+    }
+
+    // 8 — claim del posto: 1 PUK = 1 utilizzatore, per sempre
     const nowIso = new Date().toISOString();
+    let reactivated = false;
 
-    if (!isReactivation) {
-      const { error: actErr } = await supabaseExternal
-        .from("licenses")
-        .update({ activated_at: nowIso, user_email: email })
-        .eq("id", license.id);
-      if (actErr) {
-        console.error("update licenses failed:", actErr.message);
-        return fail("E-500", "Attivazione non riuscita. Riprova.", 500);
-      }
-
-      const { error: pukUpErr } = await supabaseExternal
+    if (!pukRow.user_id) {
+      const { data: claimed, error: claimErr } = await ext
         .from("puk_codes")
-        .update({ used: true, used_at: nowIso })
-        .eq("id", pukRow.id);
-      if (pukUpErr) {
-        console.error("update puk_codes failed:", pukUpErr.message);
-        return fail("E-500", "Attivazione non riuscita. Riprova.", 500);
+        .update({ user_id: userId, used: true, used_at: nowIso, assignee_email: email })
+        .eq("id", pukRow.id)
+        .is("user_id", null)
+        .select("id");
+      if (claimErr) {
+        console.error("claim puk failed:", claimErr.message);
+        return fail("E-500", "Errore tecnico imprevisto. Riprova più tardi.", 500);
       }
+      if (!claimed || claimed.length === 0) {
+        return fail("E-202", "Questo PUK è già assegnato a un altro utilizzatore.", 400);
+      }
+    } else if (pukRow.user_id === userId) {
+      reactivated = true;
+    } else {
+      return fail("E-202", "Questo PUK è già assegnato a un altro utilizzatore.", 400);
+    }
+
+    // 9 — prima attivazione della licenza
+    if (!license.activated_at) {
+      const { error: actErr } = await ext
+        .from("licenses")
+        .update({ activated_at: nowIso })
+        .eq("id", license.id)
+        .is("activated_at", null);
+      if (actErr) console.error("update licenses activated_at failed:", actErr.message);
     }
 
     return json({
       ok: true,
       email,
+      licenseId: license.id,
       appCode: APP_CODE,
-      activatedAt: license.activated_at ?? nowIso,
       expiresAt: license.expires_at ?? null,
-      reactivated: isReactivation,
+      reactivated,
     });
   } catch (e) {
     console.error("activate-license unexpected error:", e);
-    return fail("E-500", "Errore inatteso. Riprova più tardi.", 500);
+    return fail("E-500", "Errore tecnico imprevisto. Riprova più tardi.", 500);
   }
 });

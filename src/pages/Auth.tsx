@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { APP_CODE, setVerifiedEmail, clearVerifiedEmail } from "@/lib/app-config";
+import { APP_CODE, setVerifiedEmail, clearGateState } from "@/lib/app-config";
 import { requestOtp, verifyOtp } from "@/lib/gating";
 
 export default function Auth() {
@@ -22,7 +22,7 @@ export default function Auth() {
     const { error: err } = await requestOtp(email);
     setLoading(false);
     if (err) {
-      setError(err.message);
+      setError(`${err.code} — ${err.message}`);
       return;
     }
     setStep(2);
@@ -32,7 +32,7 @@ export default function Auth() {
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    clearVerifiedEmail();
+    clearGateState();
     await send();
   };
 
@@ -43,7 +43,7 @@ export default function Auth() {
     const { error: err } = await verifyOtp(email, code);
     setLoading(false);
     if (err) {
-      setError(err.message);
+      setError(`${err.code} — ${err.message}`);
       return;
     }
     setVerifiedEmail(email.trim().toLowerCase());
@@ -56,7 +56,7 @@ export default function Auth() {
         <CardHeader>
           <CardTitle className="text-2xl">Verifica email — {APP_CODE}</CardTitle>
           <CardDescription className="text-base">
-            Passaggio 1 di 2 — inserisci la tua email per ricevere un codice di verifica a 6 cifre.
+            Passaggio 1 di 3 — inserisci la tua email per ricevere un codice di verifica a 6 cifre.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
