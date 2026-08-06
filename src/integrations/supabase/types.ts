@@ -139,6 +139,7 @@ export type Database = {
       }
       lead_emails: {
         Row: {
+          code_sent_at: string | null
           created_at: string
           email: string
           id: string
@@ -150,6 +151,7 @@ export type Database = {
           verified_at: string | null
         }
         Insert: {
+          code_sent_at?: string | null
           created_at?: string
           email: string
           id?: string
@@ -161,6 +163,7 @@ export type Database = {
           verified_at?: string | null
         }
         Update: {
+          code_sent_at?: string | null
           created_at?: string
           email?: string
           id?: string
