@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { APP_CODE, clearVerifiedEmail, getVerifiedEmail, setActivated } from "@/lib/app-config";
+import { APP_CODE, clearGateState, getVerifiedEmail, setLicenseId } from "@/lib/app-config";
 import { activateLicense } from "@/lib/gating";
 
 export default function Activation() {
@@ -25,19 +25,23 @@ export default function Activation() {
     if (!email) return;
     setLoading(true);
     setError(null);
-    const { error: err } = await activateLicense(email, licenseKey, puk);
+    const { data, error: err } = await activateLicense(email, licenseKey, puk);
     setLoading(false);
     if (err) {
-      setError(err.message);
+      setError(`${err.code} — ${err.message}`);
       return;
     }
-    setActivated();
-    toast.success("Licenza attivata.");
-    navigate("/calcolatore", { replace: true });
+    if (!data?.licenseId) {
+      setError("E-500 — Errore tecnico imprevisto. Riprova più tardi.");
+      return;
+    }
+    setLicenseId(data.licenseId);
+    toast.success(data.reactivated ? "Licenza riattivata su questo dispositivo." : "Licenza attivata.");
+    navigate("/condizioni", { replace: true });
   };
 
   const changeEmail = () => {
-    clearVerifiedEmail();
+    clearGateState();
     navigate("/auth", { replace: true });
   };
 
@@ -47,7 +51,7 @@ export default function Activation() {
         <CardHeader>
           <CardTitle className="text-2xl">Attivazione licenza — {APP_CODE}</CardTitle>
           <CardDescription className="text-base">
-            Passaggio 2 di 2 — inserisci il codice licenza e il codice PUK ricevuti per attivare l'applicazione.
+            Passaggio 2 di 3 — inserisci il codice licenza e il codice PUK ricevuti per attivare l'applicazione.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

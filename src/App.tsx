@@ -10,6 +10,8 @@ import { LicenseGate } from "@/components/LicenseGate";
 import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
 import Activation from "./pages/Activation";
+import Terms from "./pages/Terms";
+import LicenseExpired from "./pages/LicenseExpired";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -31,6 +33,8 @@ const App = () => (
           <Routes>
             <Route path="/auth" element={<Auth />} />
             <Route path="/attivazione" element={<Activation />} />
+            <Route path="/condizioni" element={<Terms />} />
+            <Route path="/licenza-scaduta" element={<LicenseExpired />} />
             <Route path="/" element={<LicenseGate><Landing /></LicenseGate>} />
             <Route path="/login" element={<LicenseGate><Login /></LicenseGate>} />
             <Route path="/signup" element={<LicenseGate><Signup /></LicenseGate>} />
