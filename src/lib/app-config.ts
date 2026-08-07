@@ -1,4 +1,4 @@
-export const APP_CODE = "012PedFlow";
+export const APP_CODE = "011PedFlow";
 export const APP_NAME = "PedFlow";
 export const TERMS_VERSION = "v1";
 
