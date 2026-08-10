@@ -49,3 +49,6 @@ export const checkTermsConsent = (licenseId: string) =>
 
 export const recordTermsConsent = (licenseId: string, language: string) =>
   call<{ ok: true }>("terms-consent", { action: "record", licenseId, language });
+
+export const requestGateSession = (email: string) =>
+  call<{ ok: true; email: string; tokenHash: string }>("gate-session", { email });

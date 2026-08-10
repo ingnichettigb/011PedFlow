@@ -6,9 +6,28 @@ import {
   clearGateState, clearLicenseState, getLastLicenseCheck, getLicenseId, getVerifiedEmail,
   hasConsent, isActivated, setLastLicenseCheck, setLicenseInvalidReason,
 } from "@/lib/app-config";
-import { checkLicenseStatus } from "@/lib/gating";
+import { checkLicenseStatus, requestGateSession } from "@/lib/gating";
+import { supabase } from "@/integrations/supabase/client";
 
 const REVALIDATE_MS = 24 * 3600_000;
+
+/** Garantisce una sessione applicativa per l'email verificata (nessun login manuale). */
+async function ensureAppSession(email: string) {
+  const { data: existing } = await supabase.auth.getSession();
+  if (existing.session?.user?.email?.toLowerCase() === email.toLowerCase()) return;
+  if (existing.session) await supabase.auth.signOut();
+  const { data, error } = await requestGateSession(email);
+  if (error || !data?.tokenHash) {
+    console.error("gate-session failed:", error?.message);
+    return;
+  }
+  const { error: vErr } = await supabase.auth.verifyOtp({
+    email,
+    token_hash: data.tokenHash,
+    type: "email",
+  });
+  if (vErr) console.error("verifyOtp (gate session) failed:", vErr.message);
+}
 
 export function LicenseGate({ children }: { children: React.ReactNode }) {
   const location = useLocation();
@@ -26,27 +45,27 @@ export function LicenseGate({ children }: { children: React.ReactNode }) {
       setChecked(true);
       return;
     }
-    if (Date.now() - getLastLicenseCheck() < REVALIDATE_MS) {
-      setChecked(true);
-      return;
-    }
     let alive = true;
     (async () => {
-      const { data } = await checkLicenseStatus(licenseId!);
-      if (!alive) return;
-      if (data && data.valid === false) {
-        setLicenseInvalidReason(data.reason ?? "expired");
-        clearLicenseState();
-        navigate("/licenza-scaduta", { replace: true });
-        return;
+      await ensureAppSession(email!);
+      if (Date.now() - getLastLicenseCheck() >= REVALIDATE_MS) {
+        const { data } = await checkLicenseStatus(licenseId!);
+        if (!alive) return;
+        if (data && data.valid === false) {
+          setLicenseInvalidReason(data.reason ?? "expired");
+          clearLicenseState();
+          navigate("/licenza-scaduta", { replace: true });
+          return;
+        }
+        setLastLicenseCheck(Date.now());
       }
-      setLastLicenseCheck(Date.now());
+      if (!alive) return;
       setChecked(true);
     })();
     return () => {
       alive = false;
     };
-  }, [ready, licenseId, navigate, location.pathname]);
+  }, [ready, licenseId, email, navigate, location.pathname]);
 
   if (!email) return <Navigate to="/auth" replace state={{ from: location.pathname }} />;
   if (!licenseId) {
