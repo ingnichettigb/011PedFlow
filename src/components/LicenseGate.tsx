@@ -45,22 +45,21 @@ export function LicenseGate({ children }: { children: React.ReactNode }) {
       setChecked(true);
       return;
     }
-    if (Date.now() - getLastLicenseCheck() < REVALIDATE_MS) {
-      setChecked(true);
-      return;
-    }
     let alive = true;
     (async () => {
       await ensureAppSession(email!);
-      const { data } = await checkLicenseStatus(licenseId!);
-      if (!alive) return;
-      if (data && data.valid === false) {
-        setLicenseInvalidReason(data.reason ?? "expired");
-        clearLicenseState();
-        navigate("/licenza-scaduta", { replace: true });
-        return;
+      if (Date.now() - getLastLicenseCheck() >= REVALIDATE_MS) {
+        const { data } = await checkLicenseStatus(licenseId!);
+        if (!alive) return;
+        if (data && data.valid === false) {
+          setLicenseInvalidReason(data.reason ?? "expired");
+          clearLicenseState();
+          navigate("/licenza-scaduta", { replace: true });
+          return;
+        }
+        setLastLicenseCheck(Date.now());
       }
-      setLastLicenseCheck(Date.now());
+      if (!alive) return;
       setChecked(true);
     })();
     return () => {
