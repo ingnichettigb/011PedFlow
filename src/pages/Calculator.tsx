@@ -425,7 +425,7 @@ export default function Calculator() {
                 <Badge className={result.finalGroup === 1 ? "bg-destructive text-destructive-foreground text-base h-8 px-3" : "bg-success text-success-foreground text-base h-8 px-3"}>
                   {t("calc.final_group")}: {result.finalGroup === 1 ? t("calc.group1") : t("calc.group2")}
                 </Badge>
-                {result.art13Applied && <Badge variant="outline" className="text-base h-8 px-3 border-warning text-warning-foreground bg-warning/10">{t("calc.art13_label")}</Badge>}
+                {result.art13Applied && <Badge variant="outline" className="text-base h-8 px-3 font-bold border-2 border-warning bg-warning/25 text-foreground">{t("calc.art13_label")}</Badge>}
               </div>
               {result.determiningCodes.length > 0 && (
                 <div>
