@@ -4,5 +4,5 @@ import { useAuth } from "@/contexts/AuthContext";
 export default function Landing() {
   const { user, loading } = useAuth();
   if (loading) return null;
-  return <Navigate to={user ? "/calcolatore" : "/login"} replace />;
+  return <Navigate to={user ? "/calcolatore" : "/auth"} replace />;
 }
