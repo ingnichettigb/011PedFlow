@@ -9,6 +9,7 @@ import { Calculator, BookMarked, LogOut, User, Menu, Globe, Database } from "luc
 import { cn } from "@/lib/utils";
 import pedflowLogo from "@/assets/pedflow-logo.png.asset.json";
 import { AppInfoButton } from "@/components/AppInfoButton";
+import { clearGateState } from "@/lib/app-config";
 
 const LANGS = [
   { code: "it", label: "Italiano" },
@@ -30,7 +31,11 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     { to: "/databases", icon: Database, label: t("nav.databases") },
   ];
 
-  const handleSignOut = async () => { await signOut(); navigate("/"); };
+  const handleSignOut = async () => {
+    clearGateState();
+    await signOut();
+    navigate("/auth", { replace: true });
+  };
 
   const currentLang = LANGS.find((l) => l.code === i18n.language.slice(0, 2)) ?? LANGS[0];
 

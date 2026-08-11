@@ -4,7 +4,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { LicenseGate } from "@/components/LicenseGate";
 
 import Landing from "./pages/Landing";
@@ -36,10 +35,10 @@ const App = () => (
             <Route path="/signup" element={<Navigate to="/auth" replace />} />
             <Route path="/forgot-password" element={<Navigate to="/auth" replace />} />
             <Route path="/reset-password" element={<Navigate to="/auth" replace />} />
-            <Route path="/calcolatore" element={<LicenseGate><ProtectedRoute><Calculator /></ProtectedRoute></LicenseGate>} />
-            <Route path="/classificazione/:id" element={<LicenseGate><ProtectedRoute><Calculator /></ProtectedRoute></LicenseGate>} />
-            <Route path="/registro" element={<LicenseGate><ProtectedRoute><Registry /></ProtectedRoute></LicenseGate>} />
-            <Route path="/databases" element={<LicenseGate><ProtectedRoute><Databases /></ProtectedRoute></LicenseGate>} />
+            <Route path="/calcolatore" element={<LicenseGate><Calculator /></LicenseGate>} />
+            <Route path="/classificazione/:id" element={<LicenseGate><Calculator /></LicenseGate>} />
+            <Route path="/registro" element={<LicenseGate><Registry /></LicenseGate>} />
+            <Route path="/databases" element={<LicenseGate><Databases /></LicenseGate>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
