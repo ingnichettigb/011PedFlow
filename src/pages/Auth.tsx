@@ -38,7 +38,9 @@ export default function Auth() {
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    clearGateState();
+    const normalizedEmail = email.trim().toLowerCase();
+    const previousEmail = getVerifiedEmail()?.toLowerCase();
+    if (previousEmail && previousEmail !== normalizedEmail) clearGateState();
     await send();
   };
 
