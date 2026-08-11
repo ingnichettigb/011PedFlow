@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { APP_CODE, setVerifiedEmail, clearGateState } from "@/lib/app-config";
+import { APP_CODE, setVerifiedEmail, clearGateState, getLicenseId, getVerifiedEmail, hasConsent, isActivated } from "@/lib/app-config";
 import { requestOtp, verifyOtp } from "@/lib/gating";
 
 export default function Auth() {
@@ -15,6 +15,12 @@ export default function Auth() {
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (getVerifiedEmail() && getLicenseId() && hasConsent() && isActivated()) {
+      navigate("/calcolatore", { replace: true });
+    }
+  }, [navigate]);
 
   const send = async (silent = false) => {
     setLoading(true);
@@ -32,7 +38,9 @@ export default function Auth() {
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    clearGateState();
+    const normalizedEmail = email.trim().toLowerCase();
+    const previousEmail = getVerifiedEmail()?.toLowerCase();
+    if (previousEmail && previousEmail !== normalizedEmail) clearGateState();
     await send();
   };
 

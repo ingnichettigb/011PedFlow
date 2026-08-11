@@ -12,27 +12,38 @@ import { supabase } from "@/integrations/supabase/client";
 const REVALIDATE_MS = 24 * 3600_000;
 
 /** Garantisce una sessione applicativa per l'email verificata (nessun login manuale). */
-async function ensureAppSession(email: string) {
+async function ensureAppSession(email: string): Promise<string | null> {
   const { data: existing } = await supabase.auth.getSession();
-  if (existing.session?.user?.email?.toLowerCase() === email.toLowerCase()) return;
+  if (existing.session?.user?.email?.toLowerCase() === email.toLowerCase()) return null;
   if (existing.session) await supabase.auth.signOut();
   const { data, error } = await requestGateSession(email);
   if (error || !data?.tokenHash) {
     console.error("gate-session failed:", error?.message);
-    return;
+    return error?.message ?? "Impossibile creare la sessione di accesso.";
   }
   const { error: vErr } = await supabase.auth.verifyOtp({
     email,
     token_hash: data.tokenHash,
     type: "email",
   });
-  if (vErr) console.error("verifyOtp (gate session) failed:", vErr.message);
+  if (vErr) {
+    console.error("verifyOtp (gate session) failed:", vErr.message);
+    return "Impossibile completare la sessione di accesso.";
+  }
+
+  const { data: confirmed } = await supabase.auth.getSession();
+  if (confirmed.session?.user?.email?.toLowerCase() !== email.toLowerCase()) {
+    return "La sessione non è stata confermata. Riprova.";
+  }
+  return null;
 }
 
 export function LicenseGate({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const navigate = useNavigate();
   const [checked, setChecked] = useState(false);
+  const [sessionError, setSessionError] = useState<string | null>(null);
+  const [attempt, setAttempt] = useState(0);
 
   const email = getVerifiedEmail();
   const licenseId = getLicenseId();
@@ -47,9 +58,17 @@ export function LicenseGate({ children }: { children: React.ReactNode }) {
     }
     let alive = true;
     (async () => {
-      await ensureAppSession(email!);
+      if (!email || !licenseId) return;
+      setChecked(false);
+      setSessionError(null);
+      const accessError = await ensureAppSession(email);
+      if (!alive) return;
+      if (accessError) {
+        setSessionError(accessError);
+        return;
+      }
       if (Date.now() - getLastLicenseCheck() >= REVALIDATE_MS) {
-        const { data } = await checkLicenseStatus(licenseId!);
+        const { data } = await checkLicenseStatus(licenseId);
         if (!alive) return;
         if (data && data.valid === false) {
           setLicenseInvalidReason(data.reason ?? "expired");
@@ -65,7 +84,7 @@ export function LicenseGate({ children }: { children: React.ReactNode }) {
     return () => {
       alive = false;
     };
-  }, [ready, licenseId, email, navigate, location.pathname]);
+  }, [ready, licenseId, email, navigate, attempt]);
 
   if (!email) return <Navigate to="/auth" replace state={{ from: location.pathname }} />;
   if (!licenseId) {
@@ -74,6 +93,22 @@ export function LicenseGate({ children }: { children: React.ReactNode }) {
   }
   if (!consent) return <Navigate to="/condizioni" replace state={{ from: location.pathname }} />;
   if (!activated) return <Navigate to="/attivazione" replace state={{ from: location.pathname }} />;
+
+  if (sessionError) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background px-4">
+        <div className="w-full max-w-md space-y-4 rounded border-2 border-destructive bg-card p-5 text-center">
+          <p className="text-base font-bold text-destructive">{sessionError}</p>
+          <p className="text-sm text-muted-foreground">
+            Email, licenza, PUK e consenso restano memorizzati: non devi inserirli di nuovo.
+          </p>
+          <Button className="h-11 w-full" onClick={() => setAttempt((value) => value + 1)}>
+            Riprova accesso
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   if (!checked) {
     return (

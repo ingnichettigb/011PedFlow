@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { APP_CODE, clearGateState, getVerifiedEmail, setLicenseId } from "@/lib/app-config";
+import { APP_CODE, clearGateState, getLicenseId, getVerifiedEmail, hasConsent, isActivated, setLicenseId } from "@/lib/app-config";
 import { activateLicense } from "@/lib/gating";
 
 export default function Activation() {
@@ -18,6 +18,7 @@ export default function Activation() {
 
   useEffect(() => {
     if (!email) navigate("/auth", { replace: true });
+    else if (getLicenseId() && hasConsent() && isActivated()) navigate("/calcolatore", { replace: true });
   }, [email, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {

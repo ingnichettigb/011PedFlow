@@ -8,7 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import {
-  APP_CODE, clearLicenseState, getLicenseId, getVerifiedEmail, setActivated, setConsent,
+  APP_CODE, clearLicenseState, getLicenseId, getVerifiedEmail, hasConsent, isActivated, setActivated, setConsent,
 } from "@/lib/app-config";
 import { checkTermsConsent, recordTermsConsent } from "@/lib/gating";
 import { TERMS, TermsLang, detectTermsLang } from "@/lib/terms-i18n";
@@ -34,6 +34,10 @@ export default function Terms() {
   const content = useMemo(() => TERMS[lang], [lang]);
 
   useEffect(() => {
+    if (hasConsent() && isActivated()) {
+      navigate("/calcolatore", { replace: true });
+      return;
+    }
     if (!email) {
       navigate("/auth", { replace: true });
       return;
