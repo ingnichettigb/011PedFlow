@@ -11,31 +11,52 @@ import { supabase } from "@/integrations/supabase/client";
 
 const REVALIDATE_MS = 24 * 3600_000;
 
+/** Lock module-level per evitare richieste gate-session parallele sulla stessa email. */
+const gateSessionLocks = new Map<string, Promise<string | null>>();
+
 /** Garantisce una sessione applicativa per l'email verificata (nessun login manuale). */
 async function ensureAppSession(email: string): Promise<string | null> {
-  const { data: existing } = await supabase.auth.getSession();
-  if (existing.session?.user?.email?.toLowerCase() === email.toLowerCase()) return null;
-  if (existing.session) await supabase.auth.signOut();
-  const { data, error } = await requestGateSession(email);
-  if (error || !data?.tokenHash) {
-    console.error("gate-session failed:", error?.message);
-    return error?.message ?? "Impossibile creare la sessione di accesso.";
-  }
-  const { error: vErr } = await supabase.auth.verifyOtp({
-    email,
-    token_hash: data.tokenHash,
-    type: "email",
-  });
-  if (vErr) {
-    console.error("verifyOtp (gate session) failed:", vErr.message);
-    return "Impossibile completare la sessione di accesso.";
-  }
+  const key = email.toLowerCase();
+  const existing = gateSessionLocks.get(key);
+  if (existing) return existing;
 
-  const { data: confirmed } = await supabase.auth.getSession();
-  if (confirmed.session?.user?.email?.toLowerCase() !== email.toLowerCase()) {
-    return "La sessione non è stata confermata. Riprova.";
-  }
-  return null;
+  const promise = (async (): Promise<string | null> => {
+    try {
+      const { data: existingSession } = await supabase.auth.getSession();
+      if (existingSession.session?.user?.email?.toLowerCase() === key) return null;
+      if (existingSession.session) await supabase.auth.signOut();
+
+      const { data, error } = await requestGateSession(email);
+      if (error) {
+        console.error("gate-session failed:", error.message);
+        return `${error.code} — ${error.message}`;
+      }
+      if (!data?.tokenHash) {
+        return "E-014 — Impossibile creare la sessione di accesso.";
+      }
+
+      const { error: vErr } = await supabase.auth.verifyOtp({
+        email,
+        token_hash: data.tokenHash,
+        type: "email",
+      });
+      if (vErr) {
+        console.error("verifyOtp (gate session) failed:", vErr.message);
+        return "E-015 — Impossibile completare la sessione di accesso.";
+      }
+
+      const { data: confirmed } = await supabase.auth.getSession();
+      if (confirmed.session?.user?.email?.toLowerCase() !== key) {
+        return "E-016 — La sessione non è stata confermata. Riprova.";
+      }
+      return null;
+    } finally {
+      gateSessionLocks.delete(key);
+    }
+  })();
+
+  gateSessionLocks.set(key, promise);
+  return promise;
 }
 
 export function LicenseGate({ children }: { children: React.ReactNode }) {
