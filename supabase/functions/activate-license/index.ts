@@ -119,9 +119,32 @@ Deno.serve(async (req) => {
     const nowIso = new Date().toISOString();
     let reactivated = false;
 
+    const storedAssignee =
+      typeof pukRow.assignee_email === "string"
+        ? normalizeEmail(pukRow.assignee_email)
+        : "";
+
+    // I dati storici possono avere assignee_email vuoto e user_id collegato a
+    // una riga duplicata della stessa email. Verifichiamo quindi anche il
+    // proprietario effettivo del vecchio user_id prima di restituire E-202.
+    let ownerEmail = "";
+    if (pukRow.user_id && pukRow.user_id !== userId) {
+      const { data: owner, error: ownerErr } = await ext
+        .from("users")
+        .select("email")
+        .eq("id", pukRow.user_id)
+        .maybeSingle();
+      if (ownerErr) {
+        console.error("select puk owner failed:", ownerErr.message);
+        return fail("E-500", "Errore tecnico imprevisto. Riprova più tardi.", 500);
+      }
+      ownerEmail = normalizeEmail(owner?.email);
+    }
+
     const sameAssignee =
-      typeof pukRow.assignee_email === "string" &&
-      pukRow.assignee_email.trim().toLowerCase() === email;
+      storedAssignee === email ||
+      pukRow.user_id === userId ||
+      ownerEmail === email;
 
     if (sameAssignee) {
       // stesso utilizzatore (anche con user_id disallineato o duplicato in anagrafica)
@@ -133,7 +156,7 @@ Deno.serve(async (req) => {
           .eq("id", pukRow.id);
         if (syncErr) console.error("sync puk user_id failed:", syncErr.message);
       }
-    } else if (!pukRow.user_id) {
+    } else if (!pukRow.user_id && !storedAssignee) {
       const { data: claimed, error: claimErr } = await ext
         .from("puk_codes")
         .update({ user_id: userId, used: true, used_at: nowIso, assignee_email: email })
@@ -147,8 +170,6 @@ Deno.serve(async (req) => {
       if (!claimed || claimed.length === 0) {
         return fail("E-202", "Questo PUK è già assegnato a un altro utilizzatore.", 400);
       }
-    } else if (pukRow.user_id === userId) {
-      reactivated = true;
     } else {
       return fail("E-202", "Questo PUK è già assegnato a un altro utilizzatore.", 400);
     }
