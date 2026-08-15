@@ -57,7 +57,7 @@ Deno.serve(async (req) => {
     // 4 — PUK esistente
     const { data: pukRow, error: pukErr } = await ext
       .from("puk_codes")
-      .select("id, code, type_product_code, license_id, user_id, used")
+      .select("id, code, type_product_code, license_id, user_id, assignee_email, used")
       .eq("code", puk)
       .maybeSingle();
     if (pukErr) {
@@ -119,7 +119,21 @@ Deno.serve(async (req) => {
     const nowIso = new Date().toISOString();
     let reactivated = false;
 
-    if (!pukRow.user_id) {
+    const sameAssignee =
+      typeof pukRow.assignee_email === "string" &&
+      pukRow.assignee_email.trim().toLowerCase() === email;
+
+    if (sameAssignee) {
+      // stesso utilizzatore (anche con user_id disallineato o duplicato in anagrafica)
+      reactivated = true;
+      if (pukRow.user_id !== userId) {
+        const { error: syncErr } = await ext
+          .from("puk_codes")
+          .update({ user_id: userId, used: true, used_at: pukRow.used ? undefined : nowIso })
+          .eq("id", pukRow.id);
+        if (syncErr) console.error("sync puk user_id failed:", syncErr.message);
+      }
+    } else if (!pukRow.user_id) {
       const { data: claimed, error: claimErr } = await ext
         .from("puk_codes")
         .update({ user_id: userId, used: true, used_at: nowIso, assignee_email: email })
