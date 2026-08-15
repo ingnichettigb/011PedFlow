@@ -35,14 +35,15 @@ async function ensureAppSession(email: string): Promise<string | null> {
         return "E-014 — Impossibile creare la sessione di accesso.";
       }
 
+      // IMPORTANTE: con token_hash NON va passata l'email, altrimenti GoTrue
+      // risponde 400 "Only the token_hash and type should be provided".
       const { error: vErr } = await supabase.auth.verifyOtp({
-        email,
         token_hash: data.tokenHash,
-        type: "email",
+        type: "magiclink",
       });
       if (vErr) {
         console.error("verifyOtp (gate session) failed:", vErr.message);
-        return "E-015 — Impossibile completare la sessione di accesso.";
+        return `E-015 — Impossibile completare la sessione di accesso. (${vErr.message})`;
       }
 
       const { data: confirmed } = await supabase.auth.getSession();
