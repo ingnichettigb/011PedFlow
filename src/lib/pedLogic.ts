@@ -99,10 +99,22 @@ export function classify(input: ClassificationInput): ClassificationResult {
     };
   }
 
-  // Phase 3: no dangerous H code, check Flash Point vs Tmax (Art. 13)
+  // Phase 3: no dangerous H code and no H226.
+  // If the SDS declares H codes and none of them is a Group 1 code, the fluid is Group 2:
+  // the Flash Point / Art. 13 rule applies only to flammability (H224-H227).
+  if (codes.length > 0) {
+    return {
+      baseGroup: 2,
+      finalGroup: 2,
+      art13Applied: false,
+      determiningCodes: [],
+      reasonKey: "no_danger",
+      reasonParams: {},
+    };
+  }
+
+  // No H code declared at all: apply the cautionary principle when the Flash Point is missing.
   if (fp == null) {
-    // Cautionary principle: if any H code present (but none dangerous) and no FP
-    // OR no FP declared at all -> Group 1 by precaution
     return {
       baseGroup: 2,
       finalGroup: 1,
@@ -112,6 +124,7 @@ export function classify(input: ClassificationInput): ClassificationResult {
       reasonParams: {},
     };
   }
+
 
   if (tmax != null && fp <= tmax) {
     return {
