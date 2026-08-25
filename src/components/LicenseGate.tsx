@@ -127,6 +127,17 @@ export function LicenseGate({ children }: { children: React.ReactNode }) {
           <Button className="h-11 w-full" onClick={() => setAttempt((value) => value + 1)}>
             Riprova accesso
           </Button>
+          <Button
+            variant="outline"
+            className="h-11 w-full"
+            onClick={() => {
+              clearGateState();
+              navigate("/auth", { replace: true });
+            }}
+          >
+            Esci e ricomincia
+          </Button>
+
         </div>
       </div>
     );
