@@ -116,36 +116,14 @@ export function classify(input: ClassificationInput): ClassificationResult {
     };
   }
 
-  // No H code declared at all: apply the cautionary principle when the Flash Point is missing.
-  if (fp == null) {
-    return {
-      baseGroup: 2,
-      finalGroup: 1,
-      art13Applied: true,
-      determiningCodes: [],
-      reasonKey: "fp_missing_cautious",
-      reasonParams: {},
-    };
-  }
-
-
-  if (tmax != null && fp <= tmax) {
-    return {
-      baseGroup: 2,
-      finalGroup: 1,
-      art13Applied: true,
-      determiningCodes: [],
-      reasonKey: "fp_le_tmax",
-      reasonParams: { tmax, fp },
-    };
-  }
-
+  // No H code declared at all: no classification can be issued — the SDS must be consulted.
   return {
     baseGroup: 2,
     finalGroup: 2,
     art13Applied: false,
+    indeterminate: true,
     determiningCodes: [],
-    reasonKey: "fp_gt_tmax",
-    reasonParams: { tmax: tmax ?? "-", fp },
+    reasonKey: "no_hcodes_sds",
+    reasonParams: {},
   };
 }
