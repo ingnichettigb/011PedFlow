@@ -61,6 +61,7 @@ const es = {
     fp_missing_cautious: "Grupo 1 por principio cautelar: Punto de inflamación no declarado (Art. 13 PED).",
     fp_le_tmax: "Grupo 1 por Art. 13 PED: Tmax ({{tmax}} °C) ≥ Punto de inflamación ({{fp}} °C); el fluido se vuelve operativamente peligroso.",
     fp_gt_tmax: "Grupo 2: Punto de inflamación ({{fp}} °C) > Tmax ({{tmax}} °C) y ningún código H peligroso.",
+    no_hcodes_sds: "Clasificación no emitida: ningún código H declarado. Busca la ficha de datos de seguridad (SDS) y utiliza el sistema SDS para introducir los códigos H de la Sección 2.",
     no_danger: "Grupo 2: ningún código H peligroso y sin riesgo de inflamabilidad en condiciones operativas.",
   },
   registry: {

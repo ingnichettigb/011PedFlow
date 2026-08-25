@@ -61,6 +61,7 @@ const en = {
     fp_missing_cautious: "Group 1 by cautionary principle: Flash Point not declared (Art. 13 PED).",
     fp_le_tmax: "Group 1 per Art. 13 PED: Tmax ({{tmax}} °C) ≥ Flash Point ({{fp}} °C); fluid becomes operationally dangerous.",
     fp_gt_tmax: "Group 2: Flash Point ({{fp}} °C) > Tmax ({{tmax}} °C) and no dangerous H code.",
+    no_hcodes_sds: "No classification issued: no H code declared. Find the safety data sheet (SDS) and use the SDS method to enter the Section 2 hazard statement codes.",
     no_danger: "Group 2: no dangerous H code and no flammability risk in operating conditions.",
   },
   registry: {

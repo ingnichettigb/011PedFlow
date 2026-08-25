@@ -61,6 +61,7 @@ const it = {
     fp_missing_cautious: "Gruppo 1 per principio cautelativo: Flash Point non dichiarato (Art. 13 PED).",
     fp_le_tmax: "Gruppo 1 per Art. 13 PED: Tmax ({{tmax}} °C) ≥ Flash Point ({{fp}} °C), il fluido diventa operativamente pericoloso.",
     fp_gt_tmax: "Gruppo 2: Flash Point ({{fp}} °C) > Tmax ({{tmax}} °C) e nessun codice H pericoloso.",
+    no_hcodes_sds: "Classificazione non emessa: nessun codice H dichiarato. Cerca la scheda di sicurezza (SDS) e utilizza il sistema SDS per inserire i codici di pericolo H della Sezione 2.",
     no_danger: "Gruppo 2: nessun codice H pericoloso e nessun rischio di infiammabilità nelle condizioni operative.",
   },
   registry: {
