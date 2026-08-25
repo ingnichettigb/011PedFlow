@@ -36,6 +36,8 @@ export interface ClassificationResult {
   finalGroup: 1 | 2;
   art13Applied: boolean;
   determiningCodes: string[];
+  /** true when no H code was declared: no classification can be issued, SDS required */
+  indeterminate?: boolean;
   reasonKey:
     | "h_dangerous"
     | "h226_art13"
@@ -43,6 +45,7 @@ export interface ClassificationResult {
     | "fp_missing_cautious"
     | "fp_le_tmax"
     | "fp_gt_tmax"
+    | "no_hcodes_sds"
     | "no_danger";
   reasonParams: Record<string, string | number>;
 }
