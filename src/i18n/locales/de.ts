@@ -61,6 +61,7 @@ const de = {
     fp_missing_cautious: "Gruppe 1 nach Vorsorgeprinzip: Flammpunkt nicht angegeben (Art. 13 PED).",
     fp_le_tmax: "Gruppe 1 nach Art. 13 PED: Tmax ({{tmax}} °C) ≥ Flammpunkt ({{fp}} °C); das Fluid wird im Betrieb gefährlich.",
     fp_gt_tmax: "Gruppe 2: Flammpunkt ({{fp}} °C) > Tmax ({{tmax}} °C) und keine gefährlichen H-Codes.",
+    no_hcodes_sds: "Keine Einstufung erstellt: kein H-Code angegeben. Suchen Sie das Sicherheitsdatenblatt (SDB) und verwenden Sie das SDS-System, um die H-Codes aus Abschnitt 2 einzugeben.",
     no_danger: "Gruppe 2: keine gefährlichen H-Codes und kein Entzündbarkeitsrisiko im Betrieb.",
   },
   registry: {

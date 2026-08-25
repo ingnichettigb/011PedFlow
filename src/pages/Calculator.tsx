@@ -412,21 +412,24 @@ export default function Calculator() {
         </div>
 
         {result && (
-          <Card ref={resultRef} className={result.finalGroup === 1 ? "border-destructive border-2 scroll-mt-4" : "border-success border-2 scroll-mt-4"}>
+          <Card ref={resultRef} className={result.indeterminate ? "border-warning border-2 scroll-mt-4" : result.finalGroup === 1 ? "border-destructive border-2 scroll-mt-4" : "border-success border-2 scroll-mt-4"}>
             <CardHeader>
               <CardTitle className="flex items-center gap-3 text-xl">
-                {result.finalGroup === 1 ? <AlertTriangle className="h-7 w-7 text-destructive" /> : <CheckCircle2 className="h-7 w-7 text-success" />}
+                {result.indeterminate ? <AlertTriangle className="h-7 w-7 text-warning" /> : result.finalGroup === 1 ? <AlertTriangle className="h-7 w-7 text-destructive" /> : <CheckCircle2 className="h-7 w-7 text-success" />}
                 {t("calc.result_title")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <div className="flex flex-wrap gap-3 items-center">
-                <Badge variant="outline" className="text-base h-8 px-3">{t("calc.base_group")}: {result.baseGroup}</Badge>
-                <Badge className={result.finalGroup === 1 ? "bg-destructive text-destructive-foreground text-base h-8 px-3" : "bg-success text-success-foreground text-base h-8 px-3"}>
-                  {t("calc.final_group")}: {result.finalGroup === 1 ? t("calc.group1") : t("calc.group2")}
-                </Badge>
-                {result.art13Applied && <Badge variant="outline" className="text-base h-8 px-3 font-bold border-2 border-warning bg-warning/25 text-foreground">{t("calc.art13_label")}</Badge>}
-              </div>
+              {!result.indeterminate && (
+                <div className="flex flex-wrap gap-3 items-center">
+                  <Badge variant="outline" className="text-base h-8 px-3">{t("calc.base_group")}: {result.baseGroup}</Badge>
+                  <Badge className={result.finalGroup === 1 ? "bg-destructive text-destructive-foreground text-base h-8 px-3" : "bg-success text-success-foreground text-base h-8 px-3"}>
+                    {t("calc.final_group")}: {result.finalGroup === 1 ? t("calc.group1") : t("calc.group2")}
+                  </Badge>
+                  {result.art13Applied && <Badge variant="outline" className="text-base h-8 px-3 font-bold border-2 border-warning bg-warning/25 text-foreground">{t("calc.art13_label")}</Badge>}
+                </div>
+              )}
+
               {result.determiningCodes.length > 0 && (
                 <div>
                   <span className="text-sm font-semibold">{t("calc.determining_codes")}: </span>
