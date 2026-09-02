@@ -311,9 +311,15 @@ export default function Calculator() {
           <CardContent>
             <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "sds" | "clp")} className="w-full">
               <TabsList className="h-12">
-                <TabsTrigger value="sds" className="text-base h-10 px-4">{t("calc.tab_sds")}</TabsTrigger>
+                <TabsTrigger
+                  value="sds"
+                  className={`text-base h-10 px-4 ${clpMissing ? "bg-success text-success-foreground data-[state=active]:bg-success data-[state=active]:text-success-foreground ring-2 ring-success" : ""}`}
+                >
+                  {t("calc.tab_sds")}
+                </TabsTrigger>
                 <TabsTrigger value="clp" className="text-base h-10 px-4">{t("calc.tab_clp")}</TabsTrigger>
               </TabsList>
+
 
               <TabsContent value="sds" className="mt-4 space-y-6">
                 <div className="grid gap-4 md:grid-cols-2">
