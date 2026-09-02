@@ -65,6 +65,7 @@ export default function Calculator() {
   const [saving, setSaving] = useState(false);
   const [clpHint, setClpHint] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"sds" | "clp">("sds");
+  const [clpMissing, setClpMissing] = useState(false);
   const [hDetails, setHDetails] = useState<HCodeDetail[]>([]);
   const [orgId, setOrgId] = useState<string | null>(null);
   const resultRef = useRef<HTMLDivElement | null>(null);
@@ -311,9 +312,15 @@ export default function Calculator() {
           <CardContent>
             <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "sds" | "clp")} className="w-full">
               <TabsList className="h-12">
-                <TabsTrigger value="sds" className="text-base h-10 px-4">{t("calc.tab_sds")}</TabsTrigger>
+                <TabsTrigger
+                  value="sds"
+                  className={`text-base h-10 px-4 ${clpMissing ? "bg-success text-success-foreground data-[state=active]:bg-success data-[state=active]:text-success-foreground ring-2 ring-success" : ""}`}
+                >
+                  {t("calc.tab_sds")}
+                </TabsTrigger>
                 <TabsTrigger value="clp" className="text-base h-10 px-4">{t("calc.tab_clp")}</TabsTrigger>
               </TabsList>
+
 
               <TabsContent value="sds" className="mt-4 space-y-6">
                 <div className="grid gap-4 md:grid-cols-2">
@@ -392,7 +399,12 @@ export default function Calculator() {
               </TabsContent>
 
               <TabsContent value="clp" className="mt-4">
-                <ClpSubstancesTable onPick={handlePickClp} />
+                <ClpSubstancesTable
+                  onPick={(r) => { setClpMissing(false); handlePickClp(r); }}
+                  onNoResult={() => setClpMissing(true)}
+                  onGoToSds={() => setActiveTab("sds")}
+                />
+
               </TabsContent>
             </Tabs>
           </CardContent>

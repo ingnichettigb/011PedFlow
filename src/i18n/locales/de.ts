@@ -134,6 +134,8 @@ const de = {
     found_group: "CLP-Gruppe",
     search_button: "Suchen",
     search_prompt: "Stoffname, CAS- oder EG-Nummer eingeben und Suchen drücken.",
+    not_in_db: 'Die eingegebene CAS-Nummer / der Stoffname ist nicht in der CLP-Datenbank vorhanden. Bitte nutzen Sie das Sicherheitsdatenblatt (SDS).',
+    go_to_sds: 'Zum Sicherheitsdatenblatt (SDS)',
     no_results_sds: "Keine Übereinstimmung mit Name oder CAS-Nummer. Nutzen Sie den Tab \"SDS – Sicherheitsdatenblatt\" und geben Sie die H-Codes aus Abschnitt 2 ein.",
     imported: "Fluid aus der CLP-Datenbank importiert",
   },

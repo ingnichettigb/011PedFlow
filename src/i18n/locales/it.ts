@@ -134,6 +134,8 @@ const it = {
     found_group: "Gruppo CLP",
     search_button: "Cerca",
     search_prompt: "Inserisci un nome sostanza, CAS o EC e premi Cerca.",
+    not_in_db: "Nel database CLP il numero CAS / nome sostanza inserito non è presente. Devi procedere con l'impiego della scheda di sicurezza (SDS).",
+    go_to_sds: 'Vai alla scheda di sicurezza (SDS)',
     no_results_sds: "Nessuna corrispondenza per nome o numero CAS. Usa la scheda \"SDS – Scheda di sicurezza\" e inserisci i codici H della Sezione 2.",
     imported: "Fluido importato dal database CLP",
   },

@@ -27,7 +27,7 @@ const groupVariant = (g: string) => {
   return "bg-warning/20 text-warning-foreground border border-warning";
 };
 
-export function ClpSubstancesTable({ onPick }: { onPick?: (row: ClpRow) => void }) {
+export function ClpSubstancesTable({ onPick, onNoResult, onGoToSds }: { onPick?: (row: ClpRow) => void; onNoResult?: () => void; onGoToSds?: () => void }) {
   const { t } = useTranslation();
   const [q, setQ] = useState("");
   const [rows, setRows] = useState<ClpRow[]>([]);
@@ -46,13 +46,20 @@ export function ClpSubstancesTable({ onPick }: { onPick?: (row: ClpRow) => void 
     const { data, error } = await supabase
       .from("clp_substances_db")
       .select("*")
-      .or(`chemical_name.ilike.%${safe}%,cas_no.ilike.%${safe}%,ec_no.ilike.%${safe}%,index_no.ilike.%${safe}%`)
+      .or(`chemical_name.ilike.${safe},cas_no.ilike.${safe},ec_no.ilike.${safe},index_no.ilike.${safe}`)
       .order("chemical_name")
-      .limit(200);
+      .limit(50);
     if (error) toast.error(error.message);
-    setRows((data as ClpRow[]) ?? []);
+    const norm = (v: string | null) => (v ?? "").trim().toLowerCase();
+    const target = term.toLowerCase();
+    const exact = ((data as ClpRow[]) ?? []).filter(
+      (r) => norm(r.cas_no) === target || norm(r.ec_no) === target || norm(r.index_no) === target || norm(r.chemical_name) === target,
+    );
+    setRows(exact);
     setLoading(false);
+    if (exact.length === 0) onNoResult?.();
   };
+
 
   return (
     <Card>
@@ -80,10 +87,20 @@ export function ClpSubstancesTable({ onPick }: { onPick?: (row: ClpRow) => void 
         ) : !searched ? (
           <p className="py-8 text-center text-muted-foreground">{t("clp.search_prompt")}</p>
         ) : rows.length === 0 ? (
-          <div className="py-8 text-center space-y-2">
-            <p className="font-semibold text-warning-foreground">{t("clp.no_results")}</p>
+          <div className="py-8 text-center space-y-3">
+            <p className="font-semibold text-warning-foreground">{t("clp.not_in_db")}</p>
             <p className="text-muted-foreground">{t("clp.no_results_sds")}</p>
+            {onGoToSds && (
+              <Button
+                type="button"
+                onClick={onGoToSds}
+                className="h-11 text-base font-semibold bg-success text-success-foreground hover:bg-success/90 animate-pulse"
+              >
+                {t("clp.go_to_sds")}
+              </Button>
+            )}
           </div>
+
         ) : (
           <Table>
             <TableHeader>
@@ -129,7 +146,9 @@ export function ClpSubstancesTable({ onPick }: { onPick?: (row: ClpRow) => void 
             </TableBody>
           </Table>
         )}
-        <p className="text-xs text-muted-foreground mt-3">{t("db.count", { n: rows.length })}</p>
+        {searched && rows.length > 0 && (
+          <p className="text-xs text-muted-foreground mt-3">{t("db.count", { n: rows.length })}</p>
+        )}
       </CardContent>
     </Card>
   );
