@@ -31,45 +31,58 @@ export function ClpSubstancesTable({ onPick }: { onPick?: (row: ClpRow) => void 
   const [q, setQ] = useState("");
   const [rows, setRows] = useState<ClpRow[]>([]);
   const [loading, setLoading] = useState(false);
+  const [searched, setSearched] = useState(false);
 
-  useEffect(() => {
-    const handle = setTimeout(async () => {
-      setLoading(true);
-      let query = supabase.from("clp_substances_db").select("*").order("chemical_name").limit(200);
-      const term = q.trim();
-      if (term) {
-        const safe = term.replace(/[%_,()]/g, " ");
-        query = query.or(
-          `chemical_name.ilike.%${safe}%,cas_no.ilike.%${safe}%,ec_no.ilike.%${safe}%,index_no.ilike.%${safe}%`
-        );
-      }
-      const { data, error } = await query;
-      if (error) toast.error(error.message);
-      setRows((data as ClpRow[]) ?? []);
-      setLoading(false);
-    }, 250);
-    return () => clearTimeout(handle);
-  }, [q]);
+  const runSearch = async () => {
+    const term = q.trim();
+    if (!term) {
+      toast.error(t("clp.search_required"));
+      return;
+    }
+    setLoading(true);
+    setSearched(true);
+    const safe = term.replace(/[%_,()]/g, " ");
+    const { data, error } = await supabase
+      .from("clp_substances_db")
+      .select("*")
+      .or(`chemical_name.ilike.%${safe}%,cas_no.ilike.%${safe}%,ec_no.ilike.%${safe}%,index_no.ilike.%${safe}%`)
+      .order("chemical_name")
+      .limit(200);
+    if (error) toast.error(error.message);
+    setRows((data as ClpRow[]) ?? []);
+    setLoading(false);
+  };
 
   return (
     <Card>
       <CardHeader className="space-y-3">
         <CardTitle className="text-lg">{t("db.clp_title")}</CardTitle>
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder={t("db.clp_search")}
-            className="pl-10 h-11 text-base"
-          />
+        <div className="flex flex-col sm:flex-row gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              value={q}
+              onChange={(e) => { setQ(e.target.value); setSearched(false); setRows([]); }}
+              onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); void runSearch(); } }}
+              placeholder={t("db.clp_search")}
+              className="pl-10 h-11 text-base"
+            />
+          </div>
+          <Button type="button" onClick={() => void runSearch()} className="h-11 min-w-[120px] text-base font-semibold">
+            {t("clp.search_button")}
+          </Button>
         </div>
       </CardHeader>
       <CardContent className="overflow-x-auto">
         {loading ? (
           <p className="py-8 text-center text-muted-foreground">{t("common.loading")}</p>
+        ) : !searched ? (
+          <p className="py-8 text-center text-muted-foreground">{t("clp.search_prompt")}</p>
         ) : rows.length === 0 ? (
-          <p className="py-8 text-center text-muted-foreground">{t("clp.no_results")}</p>
+          <div className="py-8 text-center space-y-2">
+            <p className="font-semibold text-warning-foreground">{t("clp.no_results")}</p>
+            <p className="text-muted-foreground">{t("clp.no_results_sds")}</p>
+          </div>
         ) : (
           <Table>
             <TableHeader>
