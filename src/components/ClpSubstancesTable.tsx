@@ -146,7 +146,9 @@ export function ClpSubstancesTable({ onPick, onNoResult, onGoToSds }: { onPick?:
             </TableBody>
           </Table>
         )}
-        <p className="text-xs text-muted-foreground mt-3">{t("db.count", { n: rows.length })}</p>
+        {searched && rows.length > 0 && (
+          <p className="text-xs text-muted-foreground mt-3">{t("db.count", { n: rows.length })}</p>
+        )}
       </CardContent>
     </Card>
   );
