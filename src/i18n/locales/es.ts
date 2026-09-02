@@ -132,6 +132,9 @@ const es = {
     no_results: "No se encontró ningún fluido",
     use_this: "Usar este fluido",
     found_group: "Grupo CLP",
+    search_button: "Buscar",
+    search_prompt: "Introduce un nombre de sustancia, CAS o EC y pulsa Buscar.",
+    no_results_sds: "Sin coincidencias por nombre o número CAS. Usa la pestaña \"SDS – Ficha de datos de seguridad\" e introduce los códigos H de la Sección 2.",
     imported: "Fluido importado de la base CLP",
   },
 };
