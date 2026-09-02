@@ -399,7 +399,12 @@ export default function Calculator() {
               </TabsContent>
 
               <TabsContent value="clp" className="mt-4">
-                <ClpSubstancesTable onPick={handlePickClp} />
+                <ClpSubstancesTable
+                  onPick={(r) => { setClpMissing(false); handlePickClp(r); }}
+                  onNoResult={() => setClpMissing(true)}
+                  onGoToSds={() => setActiveTab("sds")}
+                />
+
               </TabsContent>
             </Tabs>
           </CardContent>
