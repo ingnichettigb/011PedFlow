@@ -87,10 +87,20 @@ export function ClpSubstancesTable({ onPick, onNoResult, onGoToSds }: { onPick?:
         ) : !searched ? (
           <p className="py-8 text-center text-muted-foreground">{t("clp.search_prompt")}</p>
         ) : rows.length === 0 ? (
-          <div className="py-8 text-center space-y-2">
-            <p className="font-semibold text-warning-foreground">{t("clp.no_results")}</p>
+          <div className="py-8 text-center space-y-3">
+            <p className="font-semibold text-warning-foreground">{t("clp.not_in_db")}</p>
             <p className="text-muted-foreground">{t("clp.no_results_sds")}</p>
+            {onGoToSds && (
+              <Button
+                type="button"
+                onClick={onGoToSds}
+                className="h-11 text-base font-semibold bg-success text-success-foreground hover:bg-success/90 animate-pulse"
+              >
+                {t("clp.go_to_sds")}
+              </Button>
+            )}
           </div>
+
         ) : (
           <Table>
             <TableHeader>
