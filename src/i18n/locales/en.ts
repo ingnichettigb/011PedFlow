@@ -134,6 +134,8 @@ const en = {
     found_group: "CLP group",
     search_button: "Search",
     search_prompt: "Enter a substance name, CAS or EC number and press Search.",
+    not_in_db: 'The CAS number / substance name entered is not present in the CLP database. You must proceed using the safety data sheet (SDS).',
+    go_to_sds: 'Go to the Safety Data Sheet (SDS)',
     no_results_sds: "No match by name or CAS number. Use the \"SDS – Safety Data Sheet\" tab and enter the Section 2 H codes.",
     imported: "Fluid imported from CLP database",
   },
