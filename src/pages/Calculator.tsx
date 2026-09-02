@@ -65,6 +65,7 @@ export default function Calculator() {
   const [saving, setSaving] = useState(false);
   const [clpHint, setClpHint] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"sds" | "clp">("sds");
+  const [clpMissing, setClpMissing] = useState(false);
   const [hDetails, setHDetails] = useState<HCodeDetail[]>([]);
   const [orgId, setOrgId] = useState<string | null>(null);
   const resultRef = useRef<HTMLDivElement | null>(null);
