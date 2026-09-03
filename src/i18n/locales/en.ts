@@ -36,6 +36,7 @@ const en = {
     l011_h: "[011] Hazard codes H (SDS Section 2)",
     l012_h_placeholder: "e.g. H225",
     l013_calc: "[013] Calculate PED Group",
+    l013_calc_print: "[013] Calculate and Print",
     l014_reset: "[014] Reset",
     l015_save_pdf: "[015] Save and generate PDF",
     fp_optional: "Leave empty if not declared (cautionary principle will apply)",
@@ -138,6 +139,14 @@ const en = {
     go_to_sds: 'Go to the Safety Data Sheet (SDS)',
     no_results_sds: "No match by name or CAS number. Use the \"SDS – Safety Data Sheet\" tab and enter the Section 2 H codes.",
     imported: "Fluid imported from CLP database",
+  },
+  quota: {
+    title: "PDF export quota",
+    badge: "PDFs available: {{n}}",
+    loading: "Checking quota...",
+    exhausted: "PDF export quota exhausted for this PUK (E-302).",
+    no_puk: "No PUK found for the given email (E-301).",
+    dec_failed: "Quota decrement failed. Please retry (E-303).",
   },
 };
 export default en;
