@@ -17,6 +17,8 @@ import type { Json } from "@/integrations/supabase/types";
 import { useAuth } from "@/contexts/AuthContext";
 import { ClpSubstancesTable, type ClpRow } from "@/components/ClpSubstancesTable";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useExportQuota } from "@/common/exports/useExportQuota";
+import { ExportCountBadge } from "@/common/exports/ExportCountBadge";
 
 const H_SLOTS = 12;
 
@@ -69,6 +71,8 @@ export default function Calculator() {
   const [hDetails, setHDetails] = useState<HCodeDetail[]>([]);
   const [orgId, setOrgId] = useState<string | null>(null);
   const resultRef = useRef<HTMLDivElement | null>(null);
+  const quota = useExportQuota();
+
 
   // Load org_id from profile
   useEffect(() => {
