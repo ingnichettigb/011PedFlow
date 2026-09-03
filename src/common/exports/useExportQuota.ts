@@ -1,17 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { FunctionsHttpError } from "@supabase/supabase-js";
-import { getVerifiedEmail } from "@/lib/app-config";
 
 export type ExportQuotaError = { code: string; message: string };
-
-type QuotaResponse = { ok: true; puk: string; remaining: number };
+type QuotaResponse = { ok: true; remaining: number };
 
 async function callQuota(action: "status" | "consume"): Promise<{ data: QuotaResponse | null; error: ExportQuotaError | null }> {
-  const email = getVerifiedEmail();
-  const { data, error } = await supabase.functions.invoke("pdf-export-quota", {
-    body: { action, email },
-  });
+  const { data, error } = await supabase.functions.invoke("pdf-export-quota", { body: { action } });
   if (!error) return { data: data as QuotaResponse, error: null };
 
   if (error instanceof FunctionsHttpError) {
@@ -32,34 +27,27 @@ export function useExportQuota() {
 
   const refetch = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await callQuota("status");
-    if (error) {
-      setError(error);
-      setRemaining(null);
-    } else {
-      setError(null);
-      setRemaining(data?.remaining ?? 0);
-    }
+    const response = await callQuota("status");
+    setError(response.error);
+    setRemaining(response.data?.remaining ?? null);
     setLoading(false);
   }, []);
 
-  useEffect(() => {
-    void refetch();
-  }, [refetch]);
+  useEffect(() => { void refetch(); }, [refetch]);
 
-  /** Consuma un export. Ritorna true solo se il decremento è riuscito. */
-  const consume = useCallback(async (): Promise<{ ok: boolean; error: ExportQuotaError | null }> => {
-    const { data, error } = await callQuota("consume");
-    if (error) {
-      setError(error);
-      return { ok: false, error };
-    }
-    setError(null);
-    setRemaining(data?.remaining ?? 0);
-    return { ok: true, error: null };
+  const consume = useCallback(async () => {
+    const response = await callQuota("consume");
+    setError(response.error);
+    if (response.data) setRemaining(response.data.remaining);
+    return response;
   }, []);
 
-  const exhausted = remaining != null && remaining <= 0;
-
-  return { remaining, loading, error, refetch, consume, exhausted };
+  return {
+    remaining,
+    loading,
+    error,
+    refetch,
+    consume,
+    exhausted: remaining != null && remaining <= 0,
+  };
 }
