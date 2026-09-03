@@ -17,6 +17,8 @@ import type { Json } from "@/integrations/supabase/types";
 import { useAuth } from "@/contexts/AuthContext";
 import { ClpSubstancesTable, type ClpRow } from "@/components/ClpSubstancesTable";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useExportQuota } from "@/common/exports/useExportQuota";
+import { ExportCountBadge } from "@/common/exports/ExportCountBadge";
 
 const H_SLOTS = 12;
 
@@ -69,6 +71,8 @@ export default function Calculator() {
   const [hDetails, setHDetails] = useState<HCodeDetail[]>([]);
   const [orgId, setOrgId] = useState<string | null>(null);
   const resultRef = useRef<HTMLDivElement | null>(null);
+  const quota = useExportQuota();
+
 
   // Load org_id from profile
   useEffect(() => {
@@ -410,18 +414,28 @@ export default function Calculator() {
           </CardContent>
         </Card>
 
-        <div className="flex flex-wrap gap-3">
-          <Button onClick={handleCalculate} size="lg" className="gap-2 h-12 text-base">
-            <CalcIcon className="h-5 w-5" /> {t("calc.l013_calc")}
+        <div className="flex flex-wrap items-center gap-3">
+          <Button
+            onClick={handleSavePdf}
+            size="lg"
+            className="gap-2 h-12 text-base"
+            disabled={saving || quota.exhausted}
+          >
+            {saving ? <Save className="h-5 w-5 animate-pulse" /> : <CalcIcon className="h-5 w-5" />}
+            {t("calc.l013_calc_print")}
           </Button>
           <Button onClick={handleReset} variant="outline" size="lg" className="gap-2 h-12 text-base">
             <RotateCcw className="h-5 w-5" /> {t("calc.l014_reset")}
           </Button>
-          <Button onClick={handleSavePdf} variant="secondary" size="lg" className="gap-2 h-12 text-base" disabled={saving}>
-            {saving ? <Save className="h-5 w-5 animate-pulse" /> : <FileDown className="h-5 w-5" />}
-            {t("calc.l015_save_pdf")}
-          </Button>
+          <ExportCountBadge remaining={quota.remaining} loading={quota.loading} />
         </div>
+        {quota.exhausted && (
+          <Alert variant="destructive">
+            <AlertTriangle className="h-5 w-5" />
+            <AlertDescription>{t("quota.exhausted")}</AlertDescription>
+          </Alert>
+        )}
+
 
         {result && (
           <Card ref={resultRef} className={result.indeterminate ? "border-warning border-2 scroll-mt-4" : result.finalGroup === 1 ? "border-destructive border-2 scroll-mt-4" : "border-success border-2 scroll-mt-4"}>

@@ -36,6 +36,7 @@ const de = {
     l011_h: "[011] Gefahrenhinweise H (Abschnitt 2 SDB)",
     l012_h_placeholder: "z. B. H225",
     l013_calc: "[013] PED-Gruppe berechnen",
+    l013_calc_print: "[013] Berechnen und Drucken",
     l014_reset: "[014] Zurücksetzen",
     l015_save_pdf: "[015] Speichern und PDF erzeugen",
     fp_optional: "Leer lassen, wenn nicht angegeben (Vorsorgeprinzip wird angewendet)",
@@ -138,6 +139,14 @@ const de = {
     go_to_sds: 'Zum Sicherheitsdatenblatt (SDS)',
     no_results_sds: "Keine Übereinstimmung mit Name oder CAS-Nummer. Nutzen Sie den Tab \"SDS – Sicherheitsdatenblatt\" und geben Sie die H-Codes aus Abschnitt 2 ein.",
     imported: "Fluid aus der CLP-Datenbank importiert",
+  },
+  quota: {
+    title: "PDF-Exportkontingent",
+    badge: "Verfügbare PDFs: {{n}}",
+    loading: "Kontingent wird geprüft...",
+    exhausted: "PDF-Exportkontingent für diesen PUK erschöpft (E-302).",
+    no_puk: "Kein PUK für die angegebene E-Mail gefunden (E-301).",
+    dec_failed: "Kontingent konnte nicht verringert werden. Bitte erneut versuchen (E-303).",
   },
 };
 export default de;

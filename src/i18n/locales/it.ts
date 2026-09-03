@@ -36,6 +36,7 @@ const it = {
     l011_h: "[011] Codici di pericolo H (Sezione 2 SDS)",
     l012_h_placeholder: "es. H225",
     l013_calc: "[013] Calcola Gruppo PED",
+    l013_calc_print: "[013] Calcola e Stampa",
     l014_reset: "[014] Reimposta",
     l015_save_pdf: "[015] Salva e genera PDF",
     fp_optional: "Lasciare vuoto se non dichiarato (sarà applicato il principio cautelativo)",
@@ -138,6 +139,14 @@ const it = {
     go_to_sds: 'Vai alla scheda di sicurezza (SDS)',
     no_results_sds: "Nessuna corrispondenza per nome o numero CAS. Usa la scheda \"SDS – Scheda di sicurezza\" e inserisci i codici H della Sezione 2.",
     imported: "Fluido importato dal database CLP",
+  },
+  quota: {
+    title: "Quota export PDF",
+    badge: "PDF disponibili: {{n}}",
+    loading: "Verifica quota...",
+    exhausted: "Quota di export PDF esaurita per questo PUK (E-302).",
+    no_puk: "PUK non trovato per l'email indicata (E-301).",
+    dec_failed: "Decremento della quota non riuscito. Riprova (E-303).",
   },
 };
 export default it;
