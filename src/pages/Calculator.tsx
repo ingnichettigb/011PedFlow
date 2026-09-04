@@ -450,6 +450,12 @@ export default function Calculator() {
             <AlertDescription>{t("quota.exhausted")}</AlertDescription>
           </Alert>
         )}
+        {!quota.exhausted && quota.remaining === 1 && (
+          <Alert className="border-warning bg-warning/10">
+            <AlertTriangle className="h-5 w-5 text-warning" />
+            <AlertDescription className="font-bold">{t("quota.last_warning")}</AlertDescription>
+          </Alert>
+        )}
 
 
         {result && (
