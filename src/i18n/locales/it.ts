@@ -141,6 +141,7 @@ const it = {
     imported: "Fluido importato dal database CLP",
   },
   quota: {
+    last_warning: "Attenzione: questa è l'ultima generazione PDF disponibile.",
     title: "Quota export PDF",
     badge: "PDF disponibili: {{n}}",
     loading: "Verifica quota...",
