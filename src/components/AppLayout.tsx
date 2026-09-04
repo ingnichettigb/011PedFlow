@@ -27,6 +27,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const [open, setOpen] = useState(false);
+  const quota = useExportQuota();
+
 
   const navItems = [
     { to: "/calcolatore", icon: Calculator, label: t("nav.calculator") },
