@@ -10,6 +10,9 @@ import { cn } from "@/lib/utils";
 import pedflowLogo from "@/assets/pedflow-logo.png.asset.json";
 import { AppInfoButton } from "@/components/AppInfoButton";
 import { clearGateState } from "@/lib/app-config";
+import { ExportCountBadge } from "@/common/exports/ExportCountBadge";
+import { useExportQuota } from "@/common/exports/useExportQuota";
+
 
 const LANGS = [
   { code: "it", label: "Italiano" },
