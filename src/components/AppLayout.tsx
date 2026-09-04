@@ -57,12 +57,19 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             {navItems.map((item) => {
               const isActive = pathname.startsWith(item.to);
               return (
-                <Link key={item.to} to={item.to}>
-                  <Button variant={isActive ? "secondary" : "ghost"} className={cn("gap-2 h-11 text-base", isActive && "bg-accent text-accent-foreground")}>
+                <Link key={item.to} to={item.to} aria-current={isActive ? "page" : undefined}>
+                  <Button
+                    variant={isActive ? "secondary" : "ghost"}
+                    className={cn(
+                      "gap-2 h-11 text-base font-semibold",
+                      isActive && "bg-primary/15 text-primary border-2 border-primary/40 hover:bg-primary/20"
+                    )}
+                  >
                     <item.icon className="h-5 w-5" />
                     <span>{item.label}</span>
                   </Button>
                 </Link>
+
               );
             })}
           </nav>
