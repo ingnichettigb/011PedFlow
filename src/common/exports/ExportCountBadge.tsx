@@ -27,7 +27,7 @@ export function ExportCountBadge({ remaining, loading, className }: Props) {
       className={`gap-2 h-9 px-3 text-sm font-bold ${className ?? ""}`}
     >
       <FileDown className="h-4 w-4" />
-      {t("quota.badge", { n: remaining ?? 0 })}
+      {remaining == null ? t("quota.badge", { n: "—" }) : t("quota.badge", { n: remaining })}
     </Badge>
   );
 }

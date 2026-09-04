@@ -10,6 +10,9 @@ import { cn } from "@/lib/utils";
 import pedflowLogo from "@/assets/pedflow-logo.png.asset.json";
 import { AppInfoButton } from "@/components/AppInfoButton";
 import { clearGateState } from "@/lib/app-config";
+import { ExportCountBadge } from "@/common/exports/ExportCountBadge";
+import { useExportQuota } from "@/common/exports/useExportQuota";
+
 
 const LANGS = [
   { code: "it", label: "Italiano" },
@@ -24,6 +27,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const [open, setOpen] = useState(false);
+  const quota = useExportQuota();
+
 
   const navItems = [
     { to: "/calcolatore", icon: Calculator, label: t("nav.calculator") },
@@ -75,7 +80,9 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           </nav>
 
           <div className="flex items-center gap-2 ml-auto md:ml-0">
+            <ExportCountBadge remaining={quota.remaining} loading={quota.loading} className="hidden sm:flex" />
             <AppInfoButton />
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" className="h-11 gap-2" aria-label={t("nav.language")}>
