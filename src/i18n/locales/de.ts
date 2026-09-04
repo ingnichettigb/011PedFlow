@@ -141,6 +141,7 @@ const de = {
     imported: "Fluid aus der CLP-Datenbank importiert",
   },
   quota: {
+    last_warning: "Achtung: Dies ist die letzte verfügbare PDF-Erstellung.",
     title: "PDF-Exportkontingent",
     badge: "Verfügbare PDFs: {{n}}",
     loading: "Kontingent wird geprüft...",

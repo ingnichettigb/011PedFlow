@@ -211,7 +211,22 @@ export default function Calculator() {
 
     const r = buildAndValidate(dangerSet);
     if (!r) { setSaving(false); return; }
+
+    // Consumo quota export PDF: una sola chiamata atomica, prima di salvare/stampare.
+    const quotaRes = await quota.consume();
+    if (quotaRes.error || !quotaRes.data) {
+      const code = quotaRes.error?.code;
+      toast.error(
+        code === "E-302" ? t("quota.exhausted")
+        : code === "E-301" ? t("quota.no_puk")
+        : t("quota.dec_failed")
+      );
+      setSaving(false);
+      return;
+    }
+
     setResult(r);
+
     const fp = numOrNull(form.flashPoint);
     const tmin = numOrNull(form.tMin);
     const tmax = numOrNull(form.tMax);
@@ -433,6 +448,12 @@ export default function Calculator() {
           <Alert variant="destructive">
             <AlertTriangle className="h-5 w-5" />
             <AlertDescription>{t("quota.exhausted")}</AlertDescription>
+          </Alert>
+        )}
+        {!quota.exhausted && quota.remaining === 1 && (
+          <Alert className="border-warning bg-warning/10">
+            <AlertTriangle className="h-5 w-5 text-warning" />
+            <AlertDescription className="font-bold">{t("quota.last_warning")}</AlertDescription>
           </Alert>
         )}
 
