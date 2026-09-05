@@ -1,6 +1,6 @@
-import { Badge } from "@/components/ui/badge";
 import { useTranslation } from "react-i18next";
-import { FileDown, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type Props = {
   remaining: number | null;
@@ -13,22 +13,34 @@ export function ExportCountBadge({ remaining, loading, className }: Props) {
 
   if (loading) {
     return (
-      <Badge variant="outline" className={`gap-2 h-9 px-3 text-sm ${className ?? ""}`}>
-        <Loader2 className="h-4 w-4 animate-spin" /> {t("quota.loading")}
-      </Badge>
+      <div
+        className={cn(
+          "inline-flex h-9 w-9 items-center justify-center rounded-full bg-info text-info-foreground shadow",
+          className
+        )}
+        title={t("quota.loading")}
+        aria-label={t("quota.loading")}
+      >
+        <Loader2 className="h-4 w-4 animate-spin" />
+      </div>
     );
   }
 
+  const display = remaining == null ? "—" : String(remaining);
   const exhausted = remaining != null && remaining <= 0;
 
   return (
-    <Badge
-      variant={exhausted ? "destructive" : "secondary"}
-      className={`gap-2 h-9 px-3 text-sm font-bold ${className ?? ""}`}
+    <div
+      className={cn(
+        "inline-flex h-9 w-9 items-center justify-center rounded-full font-bold text-sm shadow",
+        exhausted ? "bg-destructive text-destructive-foreground" : "bg-info text-info-foreground",
+        className
+      )}
+      title={t("quota.badge", { n: remaining == null ? "—" : remaining })}
+      aria-label={t("quota.badge", { n: remaining == null ? "—" : remaining })}
     >
-      <FileDown className="h-4 w-4" />
-      {remaining == null ? t("quota.badge", { n: "—" }) : t("quota.badge", { n: remaining })}
-    </Badge>
+      {display}
+    </div>
   );
 }
 

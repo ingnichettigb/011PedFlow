@@ -80,7 +80,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           </nav>
 
           <div className="flex items-center gap-2 ml-auto md:ml-0">
-            <ExportCountBadge remaining={quota.remaining} loading={quota.loading} className="hidden sm:flex" />
+            <ExportCountBadge remaining={quota.remaining} loading={quota.loading} />
             <AppInfoButton />
 
             <DropdownMenu>
