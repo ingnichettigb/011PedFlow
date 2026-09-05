@@ -439,10 +439,10 @@ export default function Calculator() {
             {saving ? <Save className="h-5 w-5 animate-pulse" /> : <CalcIcon className="h-5 w-5" />}
             {t("calc.l013_calc_print")}
           </Button>
+          <ExportCountBadge remaining={quota.remaining} loading={quota.loading} />
           <Button onClick={handleReset} variant="outline" size="lg" className="gap-2 h-12 text-base">
             <RotateCcw className="h-5 w-5" /> {t("calc.l014_reset")}
           </Button>
-          <ExportCountBadge remaining={quota.remaining} loading={quota.loading} />
         </div>
         {quota.exhausted && (
           <Alert variant="destructive">
