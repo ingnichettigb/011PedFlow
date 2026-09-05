@@ -59,6 +59,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           </div>
 
           <nav className="hidden md:flex items-center gap-2 flex-1 justify-end mr-3">
+            <ExportCountBadge remaining={quota.remaining} loading={quota.loading} />
             {navItems.map((item) => {
               const isActive = pathname.startsWith(item.to);
               return (
@@ -80,7 +81,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           </nav>
 
           <div className="flex items-center gap-2 ml-auto md:ml-0">
-            <ExportCountBadge remaining={quota.remaining} loading={quota.loading} />
+            <ExportCountBadge remaining={quota.remaining} loading={quota.loading} className="md:hidden" />
             <AppInfoButton />
 
             <DropdownMenu>
