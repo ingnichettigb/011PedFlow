@@ -21,6 +21,7 @@ const de = {
     fluid_section: "Fluididentifikation",
     tab_sds: "SDS – Sicherheitsdatenblatt",
     tab_clp: "Stoffname / CAS",
+    sds_tooltip: "Stellen Sie sicher, dass Sie das relevante Sicherheitsdatenblatt (SDB) für das zu analysierende Produkt vorliegen haben",
     sds_section: "SDB – Sicherheitsdatenblatt",
     op_section: "Betriebsbedingungen",
     l001_commessa: "[001] Auftragsnr.",

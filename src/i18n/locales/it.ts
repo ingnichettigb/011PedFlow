@@ -21,6 +21,7 @@ const it = {
     fluid_section: "Identificazione fluido",
     tab_sds: "SDS – Scheda di sicurezza",
     tab_clp: "Nome sostanza / CAS",
+    sds_tooltip: "È importante che tu abbia procurato la relativa scheda di sicurezza del prodotto da analizzare",
     sds_section: "SDS – Scheda di Sicurezza",
     op_section: "Condizioni operative",
     l001_commessa: "[001] Commessa",
