@@ -21,6 +21,7 @@ const en = {
     fluid_section: "Fluid identification",
     tab_sds: "SDS – Safety Data Sheet",
     tab_clp: "Substance name / CAS",
+    sds_tooltip: "Make sure you have obtained the relevant Safety Data Sheet (SDS) for the product to be analyzed",
     sds_section: "SDS – Safety Data Sheet",
     op_section: "Operating conditions",
     l001_commessa: "[001] Job no.",
