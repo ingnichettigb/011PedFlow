@@ -134,6 +134,9 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                 </Link>
               );
             })}
+            <Button variant="outline" className="w-full justify-start gap-3 h-12 text-base" onClick={() => { setOpen(false); handleSignOut(); }}>
+              <LogOut className="h-5 w-5" /> {t("nav.logout")}
+            </Button>
           </nav>
         </SheetContent>
       </Sheet>
