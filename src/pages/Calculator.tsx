@@ -17,6 +17,7 @@ import type { Json } from "@/integrations/supabase/types";
 import { useAuth } from "@/contexts/AuthContext";
 import { ClpSubstancesTable, type ClpRow } from "@/components/ClpSubstancesTable";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useExportQuota } from "@/common/exports/useExportQuota";
 import { ExportCountBadge } from "@/common/exports/ExportCountBadge";
 
