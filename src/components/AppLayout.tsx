@@ -3,9 +3,9 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Calculator, BookMarked, LogOut, User, Menu, Globe, Database } from "lucide-react";
+import { Calculator, BookMarked, LogOut, Menu, Globe, Database } from "lucide-react";
 import { cn } from "@/lib/utils";
 import pedflowLogo from "@/assets/pedflow-logo.png.asset.json";
 import { AppInfoButton } from "@/components/AppInfoButton";
@@ -100,22 +100,16 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {user && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-11 w-11 rounded-full" aria-label="User">
-                    <User className="h-5 w-5" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <div className="px-2 py-1.5 text-xs text-muted-foreground truncate">{user.email}</div>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleSignOut}>
-                    <LogOut className="mr-2 h-4 w-4" /> {t("nav.logout")}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
+            <Button
+              variant="outline"
+              className="h-11 gap-2 shrink-0 whitespace-nowrap font-bold"
+              onClick={handleSignOut}
+              title={user?.email ?? undefined}
+              aria-label={t("nav.logout")}
+            >
+              <LogOut className="h-4 w-4" />
+              <span className="hidden md:inline">{t("nav.logout")}</span>
+            </Button>
           </div>
         </div>
       </header>
@@ -140,6 +134,9 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                 </Link>
               );
             })}
+            <Button variant="outline" className="w-full justify-start gap-3 h-12 text-base" onClick={() => { setOpen(false); handleSignOut(); }}>
+              <LogOut className="h-5 w-5" /> {t("nav.logout")}
+            </Button>
           </nav>
         </SheetContent>
       </Sheet>

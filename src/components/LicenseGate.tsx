@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { LogOut } from "lucide-react";
+
 import {
   clearGateState, clearLicenseState, getLastLicenseCheck, getLicenseId, getVerifiedEmail,
   hasConsent, isActivated, setLastLicenseCheck, setLicenseInvalidReason,
@@ -151,19 +151,5 @@ export function LicenseGate({ children }: { children: React.ReactNode }) {
     );
   }
 
-  const exit = () => {
-    clearGateState();
-    navigate("/auth", { replace: true });
-  };
-
-  return (
-    <>
-      <div className="fixed right-3 top-3 z-[60]">
-        <Button variant="outline" size="sm" className="h-9 gap-2 text-sm font-bold" onClick={exit}>
-          <LogOut className="h-4 w-4" /> Esci
-        </Button>
-      </div>
-      {children}
-    </>
-  );
+  return <>{children}</>;
 }
