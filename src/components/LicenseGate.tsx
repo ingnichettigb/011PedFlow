@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { LogOut } from "lucide-react";
+
 import {
   clearGateState, clearLicenseState, getLastLicenseCheck, getLicenseId, getVerifiedEmail,
   hasConsent, isActivated, setLastLicenseCheck, setLicenseInvalidReason,
