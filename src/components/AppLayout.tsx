@@ -100,22 +100,16 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {user && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-11 w-11 rounded-full" aria-label="User">
-                    <User className="h-5 w-5" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <div className="px-2 py-1.5 text-xs text-muted-foreground truncate">{user.email}</div>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleSignOut}>
-                    <LogOut className="mr-2 h-4 w-4" /> {t("nav.logout")}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
+            <Button
+              variant="outline"
+              className="h-11 gap-2 shrink-0 whitespace-nowrap font-bold"
+              onClick={handleSignOut}
+              title={user?.email ?? undefined}
+              aria-label={t("nav.logout")}
+            >
+              <LogOut className="h-4 w-4" />
+              <span className="hidden md:inline">{t("nav.logout")}</span>
+            </Button>
           </div>
         </div>
       </header>
