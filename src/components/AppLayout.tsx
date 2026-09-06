@@ -47,31 +47,31 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-50 border-b-2 border-border bg-card">
-        <div className="flex h-16 items-center px-4 lg:px-6">
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" className="md:hidden h-11 w-11" onClick={() => setOpen(true)} aria-label="Menu">
+        <div className="flex h-16 items-center gap-2 px-4 lg:px-6">
+          <div className="flex shrink-0 items-center gap-2">
+            <Button variant="ghost" size="icon" className="lg:hidden h-11 w-11" onClick={() => setOpen(true)} aria-label="Menu">
               <Menu className="h-6 w-6" />
             </Button>
             <Link to="/calcolatore" className="flex items-center gap-2">
               <img src={pedflowLogo.url} alt="PedFlow" className="h-10 w-10 rounded-lg object-contain bg-white" />
-              <span className="text-xl font-bold text-foreground">{t("app.name")}</span>
+              <span className="hidden sm:inline text-xl font-bold text-foreground">{t("app.name")}</span>
             </Link>
           </div>
 
-          <nav className="hidden md:flex items-center gap-2 flex-1 justify-end mr-3">
-            <ExportCountBadge remaining={quota.remaining} loading={quota.loading} />
+          <nav className="hidden lg:flex min-w-0 flex-1 items-center justify-end gap-2">
+            <ExportCountBadge remaining={quota.remaining} loading={quota.loading} className="shrink-0" />
             {navItems.map((item) => {
               const isActive = pathname.startsWith(item.to);
               return (
-                <Link key={item.to} to={item.to} aria-current={isActive ? "page" : undefined}>
+                <Link key={item.to} to={item.to} aria-current={isActive ? "page" : undefined} className="shrink-0">
                   <Button
                     variant={isActive ? "secondary" : "ghost"}
                     className={cn(
-                      "gap-2 h-11 text-base font-semibold",
+                      "gap-2 h-11 px-3 text-base font-semibold whitespace-nowrap",
                       isActive && "bg-primary/15 text-primary border-2 border-primary/40 hover:bg-primary/20"
                     )}
                   >
-                    <item.icon className="h-5 w-5" />
+                    <item.icon className="h-5 w-5 shrink-0" />
                     <span>{item.label}</span>
                   </Button>
                 </Link>
@@ -80,8 +80,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             })}
           </nav>
 
-          <div className="flex items-center gap-2 ml-auto md:ml-0">
-            <ExportCountBadge remaining={quota.remaining} loading={quota.loading} className="md:hidden" />
+          <div className="flex shrink-0 items-center gap-2 ml-auto lg:ml-2">
+            <ExportCountBadge remaining={quota.remaining} loading={quota.loading} className="lg:hidden" />
             <AppInfoButton />
 
             <DropdownMenu>
