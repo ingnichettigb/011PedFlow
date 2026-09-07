@@ -337,7 +337,7 @@ export default function Calculator() {
                     <TooltipTrigger asChild>
                       <TabsTrigger
                         value="sds"
-                        className={`text-base h-10 px-4 ${clpMissing ? "bg-success text-success-foreground data-[state=active]:bg-success data-[state=active]:text-success-foreground ring-2 ring-success" : ""}`}
+                        className={`text-base h-10 px-4 border-2 border-transparent transition-colors data-[state=active]:bg-info data-[state=active]:text-info-foreground data-[state=active]:border-info data-[state=active]:font-bold ${clpMissing ? "bg-success text-success-foreground data-[state=active]:bg-success data-[state=active]:text-success-foreground ring-2 ring-success" : ""}`}
                       >
                         {t("calc.tab_sds")}
                       </TabsTrigger>
@@ -346,7 +346,7 @@ export default function Calculator() {
                       {t("calc.sds_tooltip")}
                     </TooltipContent>
                   </Tooltip>
-                  <TabsTrigger value="clp" className="text-base h-10 px-4">{t("calc.tab_clp")}</TabsTrigger>
+                  <TabsTrigger value="clp" className="text-base h-10 px-4 border-2 border-transparent transition-colors data-[state=active]:bg-info data-[state=active]:text-info-foreground data-[state=active]:border-info data-[state=active]:font-bold">{t("calc.tab_clp")}</TabsTrigger>
                 </TabsList>
               </TooltipProvider>
 
